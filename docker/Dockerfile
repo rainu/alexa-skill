@@ -2,9 +2,14 @@ FROM openjdk:8-jre-alpine
 MAINTAINER rainu <rainu@raysha.de>
 
 COPY ./docker/start.sh /application/start.sh
+
 COPY ./server/target/*.jar /application/lib/server.jar
 COPY ./server/target/lib/*.jar /application/lib/
+
 COPY ./hello/target/*.jar /application/lib/hello.jar
+
+COPY ./cloud/target/*.jar /application/lib/coud.jar
+COPY ./cloud/target/lib/*.jar /application/lib/
 
 EXPOSE 8080
 

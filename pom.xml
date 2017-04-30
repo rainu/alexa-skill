@@ -16,6 +16,7 @@
   <modules>
     <module>server</module>
     <module>hello</module>
+    <module>cloud</module>
     <module>docker</module>
   </modules>
 
