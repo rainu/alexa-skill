@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.exec.CommandLine;
@@ -82,6 +83,12 @@ public class CalendarCLIAdapter {
     if(sb.length() > 0) {
       rawEvents.add(sb.toString().trim());
     }
+    Iterator<String> iter = rawEvents.iterator();
+    while (iter.hasNext()) {
+      if(iter.next().isEmpty()) {
+        iter.remove();
+      }
+    }
 
     return rawEvents;
   }
@@ -107,7 +114,7 @@ public class CalendarCLIAdapter {
     exec.setStreamHandler(streamHandler);
 
     try {
-      exec.execute(cmd, env);
+      doExecute(cmd, exec);
     }catch(IOException e) {
       log.error("Error on executing calendar-cli.py.\nCommand: {}\nOutput: {}",
           cmd.toString(),
@@ -116,6 +123,10 @@ public class CalendarCLIAdapter {
     }
 
     return outputStream.toString();
+  }
+
+  void doExecute(CommandLine cmd, DefaultExecutor exec) throws IOException {
+    exec.execute(cmd, env);
   }
 
 }
