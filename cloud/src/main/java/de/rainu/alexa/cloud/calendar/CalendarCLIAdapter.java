@@ -3,11 +3,15 @@ package de.rainu.alexa.cloud.calendar;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is a adapter for calendar-cli command.
@@ -15,11 +19,21 @@ import org.joda.time.DateTime;
  * @link https://github.com/tobixen/calendar-cli
  */
 public class CalendarCLIAdapter {
+  private static final Logger log = LoggerFactory.getLogger(CalendarCLIAdapter.class);
 
   private final String caldavURL;
   private final String caldavUser;
   private final String caldavPassword;
   private final String calendarURL;
+
+  private static Map<String, String> env;
+  static {
+    env = new HashMap<>();
+
+    //we need this env to prevent exceptions on umlauts (each calendar entry can have one -> we can not know that)
+    env.put("PYTHONIOENCODING", "UTF-8");
+    env.putAll(System.getenv());
+  }
 
   public CalendarCLIAdapter(String caldavURL, String caldavUser, String caldavPassword, String calendarURL) {
     this.caldavURL = caldavURL;
@@ -28,6 +42,14 @@ public class CalendarCLIAdapter {
     this.calendarURL = calendarURL;
   }
 
+  /**
+   * Reads all events from this calendar.
+   *
+   * @param from Startdate to search
+   * @param to Enddate to search
+   * @return a {@link List} of all raw (ical format) found events.
+   * @throws IOException If the underlying process was failed.
+   */
   public List<String> readAgenda(DateTime from, DateTime to) throws IOException {
     List<String> subCommands = new ArrayList<>();
 
@@ -81,10 +103,19 @@ public class CalendarCLIAdapter {
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     DefaultExecutor exec = new DefaultExecutor();
-    PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+    final PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
     exec.setStreamHandler(streamHandler);
-    exec.execute(cmd);
-    return(outputStream.toString());
+
+    try {
+      exec.execute(cmd, env);
+    }catch(IOException e) {
+      log.error("Error on executing calendar-cli.py.\nCommand: {}\nOutput: {}",
+          cmd.toString(),
+          outputStream.toString());
+      throw e;
+    }
+
+    return outputStream.toString();
   }
 
 }

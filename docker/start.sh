@@ -7,4 +7,4 @@ for a in $LIB_DIR/*; do
   CP="$CP":"$a"
 done
 
-java -cp $CP $MAIN_CLASS $@
+java -cp $CP $JAVA_OPTS $MAIN_CLASS $@

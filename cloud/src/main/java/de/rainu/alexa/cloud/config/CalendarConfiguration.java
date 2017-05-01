@@ -1,15 +1,24 @@
 package de.rainu.alexa.cloud.config;
 
+import de.rainu.alexa.cloud.calendar.CalendarCLIAdapter;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
+/**
+ * This class is responsible for building {@link CalendarCLIAdapter} instances per each environment config set.
+ */
 @Configuration
-public class CalendarConfiguration {
+public class CalendarConfiguration implements BeanFactoryAware {
+  private static final Logger log = LoggerFactory.getLogger(CalendarConfiguration.class);
 
   public static final String ENVIRONMENT_PREFIX = "CALDAV_";
   public static final String ENVIRONMENT_SUFFIX_CALENDAR_URL = "CALENDAR_URL";
@@ -18,14 +27,23 @@ public class CalendarConfiguration {
   public static final String ENVIRONMENT_SUFFIX_CALDAV_URL = "URL";
   public static final String ENVIRONMENT_SUFFIX_CALENDAR_NAME = "NAME";
 
-  @Autowired
-  private ApplicationContext context;
+  ConfigurableBeanFactory beanFactory;
+
+  @Override
+  public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+    this.beanFactory = (ConfigurableBeanFactory)beanFactory;
+  }
 
   @PostConstruct
   public void buildCalendars() {
     Map<String, String> relevantEnv = getSystemEnvironment().entrySet().stream()
         .filter(env -> env.getKey().startsWith(ENVIRONMENT_PREFIX))
         .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+
+    if(relevantEnv.isEmpty()) {
+      log.warn("No calendars defined!");
+      return;
+    }
 
     long count = relevantEnv.keySet().stream()
         .filter(e -> e.endsWith(ENVIRONMENT_SUFFIX_CALDAV_URL))
@@ -46,8 +64,7 @@ public class CalendarConfiguration {
         check(caldavPW, i, ENVIRONMENT_SUFFIX_CALDAV_PW);
         check(calendarURL, i, ENVIRONMENT_SUFFIX_CALENDAR_URL);
 
-        context.getBean(calendarName,
-            caldavURL, caldavUser, caldavPW, calendarURL);
+        buildBean(calendarName, caldavURL, caldavUser, caldavPW, calendarURL);
       }
     }else{
       final String caldavURL = relevantEnv.get(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_CALDAV_URL);
@@ -62,9 +79,14 @@ public class CalendarConfiguration {
       check(caldavPW, null, ENVIRONMENT_SUFFIX_CALDAV_PW);
       check(calendarURL, null, ENVIRONMENT_SUFFIX_CALENDAR_URL);
 
-      context.getBean(calendarName,
-          caldavURL, caldavUser, caldavPW, calendarURL);
+      buildBean(calendarName, caldavURL, caldavUser, caldavPW, calendarURL);
     }
+  }
+
+  void buildBean(String calendarName, String caldavURL, String caldavUser, String caldavPW, String calendarURL) {
+    log.info("New calendar configured: " + calendarName);
+    CalendarCLIAdapter adapter = new CalendarCLIAdapter(caldavURL, caldavUser, caldavPW, calendarURL);
+    beanFactory.registerSingleton(calendarName, adapter);
   }
 
   Map<String, String> getSystemEnvironment() {

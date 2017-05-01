@@ -1,30 +1,36 @@
 package de.rainu.alexa.cloud.config;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.context.ApplicationContext;
-
-import static de.rainu.alexa.cloud.config.CalendarConfiguration.*;
+import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_PREFIX;
+import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFFIX_CALDAV_PW;
+import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFFIX_CALDAV_URL;
+import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFFIX_CALDAV_USER;
+import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFFIX_CALENDAR_NAME;
+import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFFIX_CALENDAR_URL;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
+
 @RunWith(MockitoJUnitRunner.class)
 public class CalendarConfigurationTest {
 
-  @Mock
-  ApplicationContext context;
-
   @Spy
-  @InjectMocks
   CalendarConfiguration toTest;
+
+  @Before
+  public void setup(){
+    doNothing().when(toTest).buildBean(anyString(), anyString(), anyString(), anyString(), anyString());
+  }
 
   @Test
   public void oneConfiguration() {
@@ -42,7 +48,7 @@ public class CalendarConfigurationTest {
     toTest.buildCalendars();
 
     //then
-    verify(context, times(1)).getBean(
+    verify(toTest, times(1)).buildBean(
         eq("calendar1"),
         eq("https://cloud.nextcloud.example/remote.php/dav"),
         eq("user"),
@@ -147,13 +153,13 @@ public class CalendarConfigurationTest {
     toTest.buildCalendars();
 
     //then
-    verify(context, times(1)).getBean(
+    verify(toTest, times(1)).buildBean(
         eq("calendar1"),
         eq("https://cloud.nextcloud.example/remote.php/dav"),
         eq("user"),
         eq("password"),
         eq("https://cloud.nextcloud.example/remote.php/dav/calendars/user/1c86a231-221d-4df6-ada9-c3425ffa2131/"));
-    verify(context, times(1)).getBean(
+    verify(toTest, times(1)).buildBean(
         eq("calendar2"),
         eq("https://cloud.nextcloud.example/remote.php/dav2"),
         eq("user2"),

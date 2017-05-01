@@ -1,0 +1,106 @@
+{
+  "intents": [
+    {
+      "name": "AMAZON.CancelIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.HelpIntent",
+      "samples": []
+    },
+    {
+      "name": "AMAZON.StopIntent",
+      "samples": []
+    },
+    {
+      "name": "EventQuery",
+      "samples": [
+        "was {moment} ansteht.",
+        "was {moment} zu tun ist.",
+        "was {moment} abgeht."
+      ],
+      "slots": [
+        {
+          "name": "moment",
+          "type": "Zeitraum",
+          "samples": []
+        }
+      ]
+    },
+    {
+      "name": "NextEvents",
+      "samples": [
+        "was ansteht.",
+        "was abgeht."
+      ],
+      "slots": []
+    }
+  ],
+  "types": [
+    {
+      "name": "Zeitraum",
+      "values": [
+        {
+          "name": {
+            "value": "heute"
+          }
+        },
+        {
+          "name": {
+            "value": "morgen"
+          }
+        },
+        {
+          "name": {
+            "value": "diese Woche"
+          }
+        },
+        {
+          "name": {
+            "value": "nächste Woche"
+          }
+        }
+      ]
+    }
+  ],
+  "prompts": [
+    {
+      "id": "Elicit.Intent-EventQuery.IntentSlot-moment",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Für welchen Zeitraum möchtest du Termine erfahren?"
+        }
+      ]
+    }
+  ],
+  "dialog": {
+    "version": "1.0",
+    "intents": [
+      {
+        "name": "EventQuery",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "moment",
+            "type": "Zeitraum",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-EventQuery.IntentSlot-moment"
+            }
+          }
+        ]
+      },
+      {
+        "name": "NextEvents",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": []
+      }
+    ]
+  }
+}
