@@ -57,6 +57,11 @@
         },
         {
           "name": {
+            "value": "die Woche"
+          }
+        },
+        {
+          "name": {
             "value": "nächste Woche"
           }
         }

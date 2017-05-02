@@ -6,6 +6,7 @@ import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFF
 import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFFIX_CALDAV_USER;
 import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFFIX_CALENDAR_NAME;
 import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFFIX_CALENDAR_URL;
+import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFFIX_TIMEZONE;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -29,7 +30,7 @@ public class CalendarConfigurationTest {
 
   @Before
   public void setup(){
-    doNothing().when(toTest).buildBean(anyString(), anyString(), anyString(), anyString(), anyString());
+    doNothing().when(toTest).buildBean(anyString(), anyString(), anyString(), anyString(), anyString(), anyString());
   }
 
   @Test
@@ -41,6 +42,7 @@ public class CalendarConfigurationTest {
     env.put(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_CALDAV_USER, "user");
     env.put(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_CALDAV_PW, "password");
     env.put(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_CALENDAR_URL, "https://cloud.nextcloud.example/remote.php/dav/calendars/user/1c86a231-221d-4df6-ada9-c3425ffa2131/");
+    env.put(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_TIMEZONE, "Europe/Berlin");
 
     doReturn(env).when(toTest).getSystemEnvironment();
 
@@ -53,7 +55,8 @@ public class CalendarConfigurationTest {
         eq("https://cloud.nextcloud.example/remote.php/dav"),
         eq("user"),
         eq("password"),
-        eq("https://cloud.nextcloud.example/remote.php/dav/calendars/user/1c86a231-221d-4df6-ada9-c3425ffa2131/"));
+        eq("https://cloud.nextcloud.example/remote.php/dav/calendars/user/1c86a231-221d-4df6-ada9-c3425ffa2131/"),
+        eq("Europe/Berlin"));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -140,6 +143,7 @@ public class CalendarConfigurationTest {
     env.put(ENVIRONMENT_PREFIX + "0_" + ENVIRONMENT_SUFFIX_CALDAV_USER, "user");
     env.put(ENVIRONMENT_PREFIX + "0_" + ENVIRONMENT_SUFFIX_CALDAV_PW, "password");
     env.put(ENVIRONMENT_PREFIX + "0_" + ENVIRONMENT_SUFFIX_CALENDAR_URL, "https://cloud.nextcloud.example/remote.php/dav/calendars/user/1c86a231-221d-4df6-ada9-c3425ffa2131/");
+    env.put(ENVIRONMENT_PREFIX + "0_" + ENVIRONMENT_SUFFIX_TIMEZONE, "Europe/Berlin");
 
     env.put(ENVIRONMENT_PREFIX + "1_" + ENVIRONMENT_SUFFIX_CALENDAR_NAME, "calendar2");
     env.put(ENVIRONMENT_PREFIX + "1_" + ENVIRONMENT_SUFFIX_CALDAV_URL, "https://cloud.nextcloud.example/remote.php/dav2");
@@ -158,13 +162,15 @@ public class CalendarConfigurationTest {
         eq("https://cloud.nextcloud.example/remote.php/dav"),
         eq("user"),
         eq("password"),
-        eq("https://cloud.nextcloud.example/remote.php/dav/calendars/user/1c86a231-221d-4df6-ada9-c3425ffa2131/"));
+        eq("https://cloud.nextcloud.example/remote.php/dav/calendars/user/1c86a231-221d-4df6-ada9-c3425ffa2131/"),
+        eq("Europe/Berlin"));
     verify(toTest, times(1)).buildBean(
         eq("calendar2"),
         eq("https://cloud.nextcloud.example/remote.php/dav2"),
         eq("user2"),
         eq("password2"),
-        eq("https://cloud.nextcloud.example/remote.php/dav2/calendars/user2/1c86a231-221d-4df6-ada9-c3425ffa2131/"));
+        eq("https://cloud.nextcloud.example/remote.php/dav2/calendars/user2/1c86a231-221d-4df6-ada9-c3425ffa2131/"),
+        eq(null));
   }
 
   @Test(expected = IllegalArgumentException.class)

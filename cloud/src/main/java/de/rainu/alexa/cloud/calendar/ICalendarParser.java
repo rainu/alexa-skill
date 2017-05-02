@@ -10,11 +10,19 @@ import org.springframework.stereotype.Component;
 public class ICalendarParser {
 
   public List<VEvent> parseEvents(List<String> rawEvents) {
-    return rawEvents.stream()
-        .map(raw -> Biweekly.parse(raw).all())
-        .flatMap(calendars -> calendars.stream())
-        .map(calendar -> calendar.getEvents())
-        .flatMap(events -> events.stream())
+    List<VEvent> events = rawEvents.stream()
+        .flatMap(raw -> parseEvent(raw).stream())
         .collect(Collectors.toList());
+
+    return events;
+  }
+
+  public List<VEvent> parseEvent(String rawEvent) {
+    List<VEvent> events = Biweekly.parse(rawEvent).all().stream()
+        .map(calendar -> calendar.getEvents())
+        .flatMap(e -> e.stream())
+        .collect(Collectors.toList());
+
+    return events;
   }
 }

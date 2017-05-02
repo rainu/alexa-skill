@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -26,6 +27,7 @@ public class CalendarCLIAdapter {
   private final String caldavUser;
   private final String caldavPassword;
   private final String calendarURL;
+  private final TimeZone calendarTimeZone;
 
   private static Map<String, String> env;
   static {
@@ -37,10 +39,19 @@ public class CalendarCLIAdapter {
   }
 
   public CalendarCLIAdapter(String caldavURL, String caldavUser, String caldavPassword, String calendarURL) {
+    this(caldavURL, caldavUser, caldavPassword, calendarURL, TimeZone.getTimeZone("UTC"));
+  }
+
+  public CalendarCLIAdapter(String caldavURL, String caldavUser, String caldavPassword, String calendarURL, TimeZone tz) {
     this.caldavURL = caldavURL;
     this.caldavUser = caldavUser;
     this.caldavPassword = caldavPassword;
     this.calendarURL = calendarURL;
+    this.calendarTimeZone = tz;
+  }
+
+  public TimeZone getDefaultTimeZone() {
+    return calendarTimeZone;
   }
 
   /**
@@ -126,7 +137,17 @@ public class CalendarCLIAdapter {
   }
 
   void doExecute(CommandLine cmd, DefaultExecutor exec) throws IOException {
-    exec.execute(cmd, env);
+    long time = System.currentTimeMillis();
+
+    try {
+      exec.execute(cmd, env);
+    }finally{
+      if(log.isDebugEnabled()) {
+        log.debug("Execution of command takes {}ms:\n{}",
+            (System.currentTimeMillis() - time),
+            cmd.toString());
+      }
+    }
   }
 
 }

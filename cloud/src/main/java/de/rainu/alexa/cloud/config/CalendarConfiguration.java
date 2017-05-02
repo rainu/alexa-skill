@@ -2,6 +2,7 @@ package de.rainu.alexa.cloud.config;
 
 import de.rainu.alexa.cloud.calendar.CalendarCLIAdapter;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ public class CalendarConfiguration implements BeanFactoryAware {
   public static final String ENVIRONMENT_SUFFIX_CALDAV_PW = "PASSWORD";
   public static final String ENVIRONMENT_SUFFIX_CALDAV_URL = "URL";
   public static final String ENVIRONMENT_SUFFIX_CALENDAR_NAME = "NAME";
+  public static final String ENVIRONMENT_SUFFIX_TIMEZONE = "TIMEZONE";
 
   ConfigurableBeanFactory beanFactory;
 
@@ -57,6 +59,7 @@ public class CalendarConfiguration implements BeanFactoryAware {
         final String caldavPW = relevantEnv.get(env(i, ENVIRONMENT_SUFFIX_CALDAV_PW));
         final String calendarURL = relevantEnv.get(env(i, ENVIRONMENT_SUFFIX_CALENDAR_URL));
         final String calendarName = relevantEnv.get(env(i, ENVIRONMENT_SUFFIX_CALENDAR_NAME));
+        final String timezone = relevantEnv.get(env(i, ENVIRONMENT_SUFFIX_TIMEZONE));
 
         check(caldavURL, i, ENVIRONMENT_SUFFIX_CALDAV_URL);
         check(calendarName, i, ENVIRONMENT_SUFFIX_CALENDAR_NAME);
@@ -64,7 +67,7 @@ public class CalendarConfiguration implements BeanFactoryAware {
         check(caldavPW, i, ENVIRONMENT_SUFFIX_CALDAV_PW);
         check(calendarURL, i, ENVIRONMENT_SUFFIX_CALENDAR_URL);
 
-        buildBean(calendarName, caldavURL, caldavUser, caldavPW, calendarURL);
+        buildBean(calendarName, caldavURL, caldavUser, caldavPW, calendarURL, timezone);
       }
     }else{
       final String caldavURL = relevantEnv.get(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_CALDAV_URL);
@@ -72,6 +75,7 @@ public class CalendarConfiguration implements BeanFactoryAware {
       final String caldavPW = relevantEnv.get(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_CALDAV_PW);
       final String calendarURL = relevantEnv.get(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_CALENDAR_URL);
       final String calendarName = relevantEnv.get(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_CALENDAR_NAME);
+      final String timezone = relevantEnv.get(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_TIMEZONE);
 
       check(caldavURL, null, ENVIRONMENT_SUFFIX_CALDAV_URL);
       check(calendarName, null, ENVIRONMENT_SUFFIX_CALENDAR_NAME);
@@ -79,13 +83,20 @@ public class CalendarConfiguration implements BeanFactoryAware {
       check(caldavPW, null, ENVIRONMENT_SUFFIX_CALDAV_PW);
       check(calendarURL, null, ENVIRONMENT_SUFFIX_CALENDAR_URL);
 
-      buildBean(calendarName, caldavURL, caldavUser, caldavPW, calendarURL);
+      buildBean(calendarName, caldavURL, caldavUser, caldavPW, calendarURL, timezone);
     }
   }
 
-  void buildBean(String calendarName, String caldavURL, String caldavUser, String caldavPW, String calendarURL) {
+  void buildBean(String calendarName, String caldavURL, String caldavUser, String caldavPW, String calendarURL, String timezone) {
     log.info("New calendar configured: " + calendarName);
-    CalendarCLIAdapter adapter = new CalendarCLIAdapter(caldavURL, caldavUser, caldavPW, calendarURL);
+    final CalendarCLIAdapter adapter;
+
+    if(timezone != null) {
+      adapter = new CalendarCLIAdapter(caldavURL, caldavUser, caldavPW, calendarURL, TimeZone.getTimeZone(timezone));
+    } else {
+      adapter = new CalendarCLIAdapter(caldavURL, caldavUser, caldavPW, calendarURL);
+    }
+
     beanFactory.registerSingleton(calendarName, adapter);
   }
 

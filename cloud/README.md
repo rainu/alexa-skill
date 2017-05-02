@@ -12,7 +12,8 @@ table you can find the base environment variables you have to define.
 | CALDAV_URL  | https://cloud.nextcloud.example/remote.php/dav | The CalDav-URL of your calendar. In next/own-cloud instances it is normaly &lt;domain&gt;/remove.php/dav |
 | CALDAV_USER  | rainu | The user name for this calendar. |
 | CALDAV_PASSWORD  | secret | The users password. |
-| CALDAV_CALENDAR_URL  | https://cloud.nextcloud.example/remote.php/dav/calendars/rainu/1ca2131/  | The specific calendar url. |
+| CALDAV_CALENDAR_URL  | calendars/rainu/1ca2131  | The specific calendar url. |
+| CALDAV_TIMEZONE | UTC | (optional) The default time zone for this calendar |
 
 You can configure multiple calendars. Just put a number (begining by zero) between **CALDAV_** and the **_suffix**. If you have multiple calendars the environment without numbers will be ignored! Lets say you will configure two calendars. Your environment have to look like this:
 
@@ -23,8 +24,9 @@ You can configure multiple calendars. Just put a number (begining by zero) betwe
 | CALDAV_0_USER | rainu |
 | CALDAV_0_PASSWORD | secret |
 | CALDAV_0_CALENDAR_URL | https://cloud.nextcloud.example/remote.php/dav/calendars/rainu/1ca2131/ |
+| CALDAV_0_TIMEZONE | UTC |
 | CALDAV_1_NAME | birthdays |
 | CALDAV_1_URL | https://cloud.nextcloud.example/remote.php/dav |
 | CALDAV_1_USER | rainu |
 | CALDAV_1_PASSWORD | secret |
-| CALDAV_1_CALENDAR_URL | https://cloud.nextcloud.example/remote.php/dav/calendars/rainu/456213af/ |
+| CALDAV_1_CALENDAR_URL | calendars/rainu/456213af |

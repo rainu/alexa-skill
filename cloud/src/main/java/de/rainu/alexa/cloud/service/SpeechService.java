@@ -1,10 +1,10 @@
 package de.rainu.alexa.cloud.service;
 
-import biweekly.component.VEvent;
 import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.amazon.speech.ui.SsmlOutputSpeech;
 import de.rainu.alexa.cloud.calendar.exception.CalendarReadException;
+import de.rainu.alexa.cloud.calendar.model.Event;
 import java.util.List;
 import java.util.Locale;
 import org.joda.time.DateTime;
@@ -21,141 +21,129 @@ public class SpeechService {
   @Autowired
   private MessageService messageService;
 
-  public OutputSpeech speechWelcomeMessage() {
+  public OutputSpeech speechWelcomeMessage(Locale locale) {
     final String speechText = messageService.de("welcome");
     return speechMessage(speechText);
   }
 
-  public OutputSpeech speechHelpMessage() {
+  public OutputSpeech speechHelpMessage(Locale locale) {
     final String speechText = messageService.de("help");
     return speechMessage(speechText);
   }
 
-  public OutputSpeech readEvents(List<VEvent> events){
-    return readEvents("", events);
+  public OutputSpeech readEvents(Locale locale, List<Event> events){
+    return readEvents(locale, "", events);
   }
 
-  public OutputSpeech readEvents(String moment, List<VEvent> events){
+  public OutputSpeech readEvents(Locale locale, String moment, List<Event> events){
     if(events.isEmpty()) {
       final String speechText = messageService.de("event.nothing", moment);
       return speechMessage(speechText);
     }
 
     StringBuilder sb = new StringBuilder(messageService.de("event.start", moment));
-    for(VEvent event : events) {
-      sb.append("\n");
-      sb.append(generateSpeechText(event));
+    for(Event event : events) {
+      sb.append("<break time=\"500ms\"/>");
+      sb.append(generateSpeechText(locale,event));
     }
 
     return speechMessage(sb.toString());
   }
 
-  private String generateSpeechText(VEvent event) {
+  private String generateSpeechText(Locale locale, Event event) {
     if(isToday(event)) {
-      return generateSpeechTextForToday(event);
+      return generateSpeechTextForToday(locale, event);
     }
     if(isTomorrow(event)) {
-      return generateSpeechTextForTomorrow(event);
+      return generateSpeechTextForTomorrow(locale, event);
     }
-    return generateSpeechTextForDate(event);
+    return generateSpeechTextForDate(locale, event);
   }
 
-  private boolean isToday(VEvent event) {
-    DateTime start = getStartDate(event);
+  private boolean isToday(Event event) {
+    DateTime start = event.getStart();
     DateTime now = DateTime.now();
 
     return start.getDayOfYear() == now.getDayOfYear() && start.getYear() == now.getYear();
   }
 
-  private boolean isTomorrow(VEvent event) {
-    DateTime start = getStartDate(event);
+  private boolean isTomorrow(Event event) {
+    DateTime start = event.getStart();
     DateTime tomorrow = DateTime.now().plusDays(1);
 
     return start.getDayOfYear() == tomorrow.getDayOfYear() && start.getYear() == tomorrow.getYear();
   }
 
-  private DateTime getStartDate(VEvent event) {
-    DateTime dateTime = new DateTime(event.getDateStart().getValue().getTime());
+  private String generateSpeechTextForToday(Locale locale, Event event) {
+    if(event.startHasTime()) {
+      final DateTime from = event.getStart();
 
-    return dateTime;
-  }
-
-  private DateTime getEndDate(VEvent event) {
-    DateTime dateTime = new DateTime(event.getDateEnd().getValue().getTime());
-
-    return dateTime;
-  }
-
-  private String generateSpeechTextForToday(VEvent event) {
-    if(event.getDateStart().getValue().hasTime()) {
-      final DateTime from = getStartDate(event);
-
-      if(event.getDateEnd() != null && event.getDateEnd().getValue().hasTime()) {
-        final DateTime to = getEndDate(event);
+      if(event.getEnd() != null && event.endHasTime()) {
+        final DateTime to = event.getEnd();
 
         return messageService.de("event.item.today.time.duration",
             from.toString(TIME_FORMAT),
             to.toString(TIME_FORMAT),
-            event.getSummary().getValue());
+            event.getSummary());
       }
 
       return messageService.de("event.item.today.time",
           from.toString(TIME_FORMAT),
-          event.getSummary().getValue());
+          event.getSummary());
     }
 
     return messageService.de("event.item.today",
-        event.getSummary().getValue());
+        event.getSummary());
   }
 
-  private String generateSpeechTextForTomorrow(VEvent event) {
-    if(event.getDateStart().getValue().hasTime()) {
-      final DateTime from = getStartDate(event);
+  private String generateSpeechTextForTomorrow(Locale locale, Event event) {
+    if(event.startHasTime()) {
+      final DateTime from = event.getStart();
 
-      if(event.getDateEnd() != null && event.getDateEnd().getValue().hasTime()) {
-        final DateTime to = getEndDate(event);
+      if(event.getEnd() != null && event.endHasTime()) {
+        final DateTime to = event.getEnd();
 
         return messageService.de("event.item.tomorrow.time.duration",
             from.toString(TIME_FORMAT),
             to.toString(TIME_FORMAT),
-            event.getSummary().getValue());
+            event.getSummary());
       }
 
       return messageService.de("event.item.tomorrow.time",
           from.toString(TIME_FORMAT),
-          event.getSummary().getValue());
+          event.getSummary());
     }
 
     return messageService.de("event.item.tomorrow",
-        event.getSummary().getValue());
+        event.getSummary());
   }
 
-  private String generateSpeechTextForDate(VEvent event) {
-    final DateTime from = getStartDate(event);
+  private String generateSpeechTextForDate(Locale locale, Event event) {
+    final DateTime from = event.getStart();
 
-    if(event.getDateStart().getValue().hasTime()) {
-      if(event.getDateEnd() != null && event.getDateEnd().getValue().hasTime()) {
-        final DateTime to = getEndDate(event);
+    if(event.startHasTime()) {
+      if(event.getEnd() != null && event.endHasTime()) {
+        final DateTime to = event.getEnd();
 
         return messageService.de("event.item.date.time.duration",
-            from.toString(DAY_FORMAT, Locale.GERMAN),
+            from.toString(DAY_FORMAT, locale),
             from.toString(DATE_FORMAT),
             from.toString(TIME_FORMAT),
             to.toString(TIME_FORMAT),
-            event.getSummary().getValue());
+            event.getSummary());
       }
 
       return messageService.de("event.item.date.time",
-          from.toString(DAY_FORMAT, Locale.GERMAN),
+          from.toString(DAY_FORMAT, locale),
           from.toString(DATE_FORMAT),
           from.toString(TIME_FORMAT),
-          event.getSummary().getValue());
+          event.getSummary());
     }
 
     return messageService.de("event.item.date",
-        from.toString(DAY_FORMAT, Locale.GERMAN),
+        from.toString(DAY_FORMAT, locale),
         from.toString(DATE_FORMAT),
-        event.getSummary().getValue());
+        event.getSummary());
   }
 
   public OutputSpeech speechError(CalendarReadException e) {
