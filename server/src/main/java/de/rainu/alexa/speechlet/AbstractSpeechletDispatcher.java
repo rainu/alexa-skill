@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,14 @@ public abstract class AbstractSpeechletDispatcher implements Speechlet {
   }
 
   public final SpeechletResponse onIntent(final IntentRequest request, final Session session) throws SpeechletException {
-    log.info("onIntent requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
+    log.info("onIntent requestId={}, sessionId={}, intent-name={}, intent-slots={{}}",
+        request.getRequestId(),
+        session.getSessionId(),
+        request.getIntent().getName(),
+        request.getIntent().getSlots().values().stream()
+            .map(s -> "[" + s.getName() + " => " + s.getValue() + "]")
+            .collect(Collectors.joining(", ")));
+
     return callIntent(request, session);
   }
 
