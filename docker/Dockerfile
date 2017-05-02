@@ -11,15 +11,13 @@ RUN apk add --update git python2 python-dev py-pip build-base libxml2-dev libxsl
 
 COPY ./docker/start.sh /application/start.sh
 
-# base module
+#libs
 COPY ./server/target/lib/*.jar /application/lib/
-COPY ./server/target/*.jar /application/lib/server.jar
-
-# hello module
-COPY ./hello/target/*.jar /application/lib/hello.jar
-
-# cloud module
 COPY ./cloud/target/lib/*.jar /application/lib/
+
+#modules
+COPY ./server/target/*.jar /application/lib/server.jar
+COPY ./hello/target/*.jar /application/lib/hello.jar
 COPY ./cloud/target/*.jar /application/lib/coud.jar
 
 
