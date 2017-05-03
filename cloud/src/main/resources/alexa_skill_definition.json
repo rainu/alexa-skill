@@ -15,22 +15,61 @@
     {
       "name": "EventQuery",
       "samples": [
-        "was {moment} ansteht.",
-        "was {moment} zu tun ist.",
-        "was {moment} abgeht."
+        "was {precision} {day} ansteht.",
+        "was {precision} {day} zu tun ist.",
+        "was {precision} {day} abgeht."
       ],
       "slots": [
         {
-          "name": "moment",
-          "type": "Zeitraum",
+          "name": "precision",
+          "type": "PraezisionFuerTag",
+          "samples": []
+        },
+        {
+          "name": "day",
+          "type": "Tag",
           "samples": []
         }
       ]
     },
     {
+      "name": "EventQueryNear",
+      "samples": [
+        "was {near} abgeht.",
+        "was {near} zu tun ist.",
+        "was {near} ansteht."
+      ],
+      "slots": [
+        {
+          "name": "near",
+          "type": "NaherZeitpunkt",
+          "samples": []
+        }
+      ]
+    },
+    {
+      "name": "EventQueryNextWeek",
+      "samples": [
+        "was nächste Woche ansteht.",
+        "was nächste Woche zu tun ist.",
+        "was nächste Woche abgeht."
+      ],
+      "slots": []
+    },
+    {
+      "name": "EventQueryThisWeek",
+      "samples": [
+        "was diese Woche ansteht.",
+        "was diese Woche zu tun ist.",
+        "was diese Woche abgeht."
+      ],
+      "slots": []
+    },
+    {
       "name": "NextEvents",
       "samples": [
         "was ansteht.",
+        "was zu tun ist.",
         "was abgeht."
       ],
       "slots": []
@@ -38,7 +77,7 @@
   ],
   "types": [
     {
-      "name": "Zeitraum",
+      "name": "NaherZeitpunkt",
       "values": [
         {
           "name": {
@@ -52,17 +91,77 @@
         },
         {
           "name": {
-            "value": "diese Woche"
+            "value": "übermorgen"
+          }
+        }
+      ]
+    },
+    {
+      "name": "PraezisionFuerTag",
+      "values": [
+        {
+          "name": {
+            "value": "nächsten"
           }
         },
         {
           "name": {
-            "value": "die Woche"
+            "value": "diesen"
+          }
+        }
+      ]
+    },
+    {
+      "name": "PraezisionFuerWoche",
+      "values": [
+        {
+          "name": {
+            "value": "diese"
           }
         },
         {
           "name": {
-            "value": "nächste Woche"
+            "value": "nächste"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tag",
+      "values": [
+        {
+          "name": {
+            "value": "Montag"
+          }
+        },
+        {
+          "name": {
+            "value": "Dienstag"
+          }
+        },
+        {
+          "name": {
+            "value": "Mittwoch"
+          }
+        },
+        {
+          "name": {
+            "value": "Donnerstag"
+          }
+        },
+        {
+          "name": {
+            "value": "Freitag"
+          }
+        },
+        {
+          "name": {
+            "value": "Samstag"
+          }
+        },
+        {
+          "name": {
+            "value": "Sonntag"
           }
         }
       ]
@@ -70,7 +169,29 @@
   ],
   "prompts": [
     {
-      "id": "Elicit.Intent-EventQuery.IntentSlot-moment",
+      "id": "Elicit.Intent-EventQuery.IntentSlot-precision",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Für welchen Zeitraum möchtest du Termine erfahren?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-EventQuery.IntentSlot-day",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Für welchen Zeitraum möchtest du Termine erfahren?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-EventQueryNear.IntentSlot-near",
       "promptVersion": "1.0",
       "definitionVersion": "1.0",
       "variations": [
@@ -90,15 +211,52 @@
         "prompts": {},
         "slots": [
           {
-            "name": "moment",
-            "type": "Zeitraum",
+            "name": "precision",
+            "type": "PraezisionFuerTag",
             "elicitationRequired": true,
             "confirmationRequired": false,
             "prompts": {
-              "elicit": "Elicit.Intent-EventQuery.IntentSlot-moment"
+              "elicit": "Elicit.Intent-EventQuery.IntentSlot-precision"
+            }
+          },
+          {
+            "name": "day",
+            "type": "Tag",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-EventQuery.IntentSlot-day"
             }
           }
         ]
+      },
+      {
+        "name": "EventQueryNear",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "near",
+            "type": "NaherZeitpunkt",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-EventQueryNear.IntentSlot-near"
+            }
+          }
+        ]
+      },
+      {
+        "name": "EventQueryNextWeek",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": []
+      },
+      {
+        "name": "EventQueryThisWeek",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": []
       },
       {
         "name": "NextEvents",

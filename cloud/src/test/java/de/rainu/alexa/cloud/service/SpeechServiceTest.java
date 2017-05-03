@@ -86,7 +86,7 @@ public class SpeechServiceTest {
     final SsmlOutputSpeech result = (SsmlOutputSpeech)toTest.readEvents(aLocale, moment, events);
 
     //then
-    assertEquals("<speak>Folgende Termine stehen " + moment + " an: <break time=\"1s\"/> \n"
+    assertEquals("<speak>Folgende Termine stehen " + moment + " an:<break time=\"500ms\"/>"
         + "Heute: " + event.getSummary() + "</speak>", result.getSsml());
   }
 
@@ -105,7 +105,7 @@ public class SpeechServiceTest {
     final SsmlOutputSpeech result = (SsmlOutputSpeech)toTest.readEvents(aLocale, moment, events);
 
     //then
-    assertEquals("<speak>Folgende Termine stehen " + moment + " an: <break time=\"1s\"/> \n"
+    assertEquals("<speak>Folgende Termine stehen " + moment + " an:<break time=\"500ms\"/>"
         + "Heute um " + start.toString("HH:mm") + " Uhr: " + event.getSummary() + "</speak>", result.getSsml());
   }
 
@@ -126,7 +126,7 @@ public class SpeechServiceTest {
     final SsmlOutputSpeech result = (SsmlOutputSpeech)toTest.readEvents(aLocale, moment, events);
 
     //then
-    assertEquals("<speak>Folgende Termine stehen " + moment + " an: <break time=\"1s\"/> \n"
+    assertEquals("<speak>Folgende Termine stehen " + moment + " an:<break time=\"500ms\"/>"
         + "Heute von " + start.toString("HH:mm") + " Uhr bis " + end.toString("HH:mm") + " Uhr: " + event.getSummary() + "</speak>", result.getSsml());
   }
 
@@ -144,7 +144,7 @@ public class SpeechServiceTest {
     final SsmlOutputSpeech result = (SsmlOutputSpeech)toTest.readEvents(aLocale, moment, events);
 
     //then
-    assertEquals("<speak>Folgende Termine stehen " + moment + " an: <break time=\"1s\"/> \n"
+    assertEquals("<speak>Folgende Termine stehen " + moment + " an:<break time=\"500ms\"/>"
         + "Morgen: " + event.getSummary() + "</speak>", result.getSsml());
   }
 
@@ -163,7 +163,7 @@ public class SpeechServiceTest {
     final SsmlOutputSpeech result = (SsmlOutputSpeech)toTest.readEvents(aLocale, moment, events);
 
     //then
-    assertEquals("<speak>Folgende Termine stehen " + moment + " an: <break time=\"1s\"/> \n"
+    assertEquals("<speak>Folgende Termine stehen " + moment + " an:<break time=\"500ms\"/>"
         + "Morgen um " + start.toString("HH:mm") + " Uhr: " + event.getSummary() + "</speak>", result.getSsml());
   }
 
@@ -184,7 +184,7 @@ public class SpeechServiceTest {
     final SsmlOutputSpeech result = (SsmlOutputSpeech)toTest.readEvents(aLocale, moment, events);
 
     //then
-    assertEquals("<speak>Folgende Termine stehen " + moment + " an: <break time=\"1s\"/> \n"
+    assertEquals("<speak>Folgende Termine stehen " + moment + " an:<break time=\"500ms\"/>"
         + "Morgen von " + start.toString("HH:mm") + " Uhr bis " + end.toString("HH:mm") + " Uhr: " + event.getSummary() + "</speak>", result.getSsml());
   }
 
@@ -203,7 +203,7 @@ public class SpeechServiceTest {
     final SsmlOutputSpeech result = (SsmlOutputSpeech)toTest.readEvents(aLocale, moment, events);
 
     //then
-    assertEquals(String.format("<speak>Folgende Termine stehen %s an: <break time=\"1s\"/> \nAm %s den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as>: %s</speak>",
+    assertEquals(String.format("<speak>Folgende Termine stehen %s an:<break time=\"500ms\"/>Am %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as>: %s</speak>",
         moment,
         start.toString("EEEE", aLocale),
         start.toString("dd.MM."),
@@ -226,7 +226,7 @@ public class SpeechServiceTest {
     final SsmlOutputSpeech result = (SsmlOutputSpeech)toTest.readEvents(aLocale, moment, events);
 
     //then
-    assertEquals(String.format("<speak>Folgende Termine stehen %s an: <break time=\"1s\"/> \nAm %s den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> um %s Uhr: %s</speak>",
+    assertEquals(String.format("<speak>Folgende Termine stehen %s an:<break time=\"500ms\"/>Am %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> um %s Uhr: %s</speak>",
         moment,
         start.toString("EEEE", aLocale),
         start.toString("dd.MM."),
@@ -252,7 +252,7 @@ public class SpeechServiceTest {
     final SsmlOutputSpeech result = (SsmlOutputSpeech)toTest.readEvents(aLocale, moment, events);
 
     //then
-    assertEquals(String.format("<speak>Folgende Termine stehen %s an: <break time=\"1s\"/> \nAm %s den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> von %s Uhr bis %s Uhr: %s</speak>",
+    assertEquals(String.format("<speak>Folgende Termine stehen %s an:<break time=\"500ms\"/>Am %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> von %s Uhr bis %s Uhr: %s</speak>",
         moment,
         start.toString("EEEE", aLocale),
         start.toString("dd.MM."),
