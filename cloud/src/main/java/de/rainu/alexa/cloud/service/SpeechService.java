@@ -3,7 +3,7 @@ package de.rainu.alexa.cloud.service;
 import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.amazon.speech.ui.SsmlOutputSpeech;
-import de.rainu.alexa.cloud.calendar.exception.CalendarReadException;
+import de.rainu.alexa.cloud.calendar.exception.AlexaExcpetion;
 import de.rainu.alexa.cloud.calendar.model.Event;
 import java.util.List;
 import java.util.Locale;
@@ -31,30 +31,30 @@ public class SpeechService {
     return speechMessage(speechText);
   }
 
-  public OutputSpeech readEvents(Locale locale, List<Event> events){
+  public OutputSpeech readEvents(Locale locale, List<Event> events) {
     return readEvents(locale, "", events);
   }
 
-  public OutputSpeech readEvents(Locale locale, String moment, List<Event> events){
-    if(events.isEmpty()) {
+  public OutputSpeech readEvents(Locale locale, String moment, List<Event> events) {
+    if (events.isEmpty()) {
       final String speechText = messageService.de("event.nothing", moment);
       return speechMessage(speechText);
     }
 
     StringBuilder sb = new StringBuilder(messageService.de("event.start", moment));
-    for(Event event : events) {
+    for (Event event : events) {
       sb.append("<break time=\"500ms\"/>");
-      sb.append(generateSpeechText(locale,event));
+      sb.append(generateSpeechText(locale, event));
     }
 
     return speechMessage(sb.toString());
   }
 
   private String generateSpeechText(Locale locale, Event event) {
-    if(isToday(event)) {
+    if (isToday(event)) {
       return generateSpeechTextForToday(locale, event);
     }
-    if(isTomorrow(event)) {
+    if (isTomorrow(event)) {
       return generateSpeechTextForTomorrow(locale, event);
     }
     return generateSpeechTextForDate(locale, event);
@@ -75,10 +75,10 @@ public class SpeechService {
   }
 
   private String generateSpeechTextForToday(Locale locale, Event event) {
-    if(event.startHasTime()) {
+    if (event.startHasTime()) {
       final DateTime from = event.getStart();
 
-      if(event.getEnd() != null && event.endHasTime()) {
+      if (event.getEnd() != null && event.endHasTime()) {
         final DateTime to = event.getEnd();
 
         return messageService.de("event.item.today.time.duration",
@@ -97,10 +97,10 @@ public class SpeechService {
   }
 
   private String generateSpeechTextForTomorrow(Locale locale, Event event) {
-    if(event.startHasTime()) {
+    if (event.startHasTime()) {
       final DateTime from = event.getStart();
 
-      if(event.getEnd() != null && event.endHasTime()) {
+      if (event.getEnd() != null && event.endHasTime()) {
         final DateTime to = event.getEnd();
 
         return messageService.de("event.item.tomorrow.time.duration",
@@ -121,8 +121,8 @@ public class SpeechService {
   private String generateSpeechTextForDate(Locale locale, Event event) {
     final DateTime from = event.getStart();
 
-    if(event.startHasTime()) {
-      if(event.getEnd() != null && event.endHasTime()) {
+    if (event.startHasTime()) {
+      if (event.getEnd() != null && event.endHasTime()) {
         final DateTime to = event.getEnd();
 
         return messageService.de("event.item.date.time.duration",
@@ -146,14 +146,20 @@ public class SpeechService {
         event.getSummary());
   }
 
-  public OutputSpeech speechError(CalendarReadException e) {
-    final String speechText = messageService.de("event.error.read");
+  public OutputSpeech speechError(Throwable t) {
+    final String speechText;
+    if (t instanceof AlexaExcpetion) {
+      speechText = messageService.de(((AlexaExcpetion)t).getMessageKey());
+    } else {
+      speechText = messageService.de("event.error");
+    }
+
     return speechMessage(speechText);
   }
 
   private OutputSpeech speechMessage(String speechText) {
     // Create the plain text output.
-    if(speechText.contains("<")) {
+    if (speechText.contains("<")) {
       SsmlOutputSpeech speech = new SsmlOutputSpeech();
 
       final String targetSpeech = "<speak>" + speechText + "</speak>";

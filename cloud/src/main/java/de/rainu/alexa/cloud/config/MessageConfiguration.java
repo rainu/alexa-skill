@@ -42,6 +42,8 @@ public class MessageConfiguration {
     m.put("event.item.date.time", "Am %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> um %s Uhr: %s");
     m.put("event.item.date.time.duration", "Am %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> von %s Uhr bis %s Uhr: %s");
     m.put("event.nothing", "Es stehen %s keine Termine an.");
+    m.put("event.error", "Es tut mir leid. Es ist leider ein Fehler aufgetreten.");
+    m.put("event.error.unknown.moment", "Es tut mir leid. Diese Zeitangabe ist mir unbekannt.");
     m.put("event.error.read", "Es tut mir leid. Ich konnte die Termine nicht auslesen.");
 
     return Collections.unmodifiableMap(m);

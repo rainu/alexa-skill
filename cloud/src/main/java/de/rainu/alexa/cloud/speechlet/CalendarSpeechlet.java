@@ -8,6 +8,7 @@ import com.amazon.speech.ui.OutputSpeech;
 import de.rainu.alexa.annotation.OnIntent;
 import de.rainu.alexa.annotation.OnLaunch;
 import de.rainu.alexa.cloud.calendar.exception.CalendarReadException;
+import de.rainu.alexa.cloud.calendar.exception.UnknownMomentException;
 import de.rainu.alexa.cloud.calendar.model.Event;
 import de.rainu.alexa.cloud.calendar.model.Moment;
 import de.rainu.alexa.cloud.calendar.service.CalendarService;
@@ -109,6 +110,10 @@ public class CalendarSpeechlet extends AbstractSpeechletDispatcher {
   }
 
   private SpeechletResponse handleEventQuery(Locale locale, Moment moment) {
+    if(moment == null) {
+      return SpeechletResponse.newTellResponse(speechService.speechError(new UnknownMomentException()));
+    }
+
     List<Event> nextEvents;
     try {
       nextEvents = calendarService.getEvents(moment.getFrom(), moment.getTo());
