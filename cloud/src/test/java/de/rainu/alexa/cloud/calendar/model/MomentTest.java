@@ -9,17 +9,6 @@ import org.junit.Test;
 public class MomentTest {
 
   @Test
-  public void endOfWeek() {
-    assertEquals(7, Moment.endOfWeek(DateTime.now()).getDayOfWeek());
-    assertEquals(7, Moment.endOfWeek(DateTime.now().withDayOfWeek(2)).getDayOfWeek());
-    assertEquals(7, Moment.endOfWeek(DateTime.now().withDayOfWeek(3)).getDayOfWeek());
-    assertEquals(7, Moment.endOfWeek(DateTime.now().withDayOfWeek(4)).getDayOfWeek());
-    assertEquals(7, Moment.endOfWeek(DateTime.now().withDayOfWeek(5)).getDayOfWeek());
-    assertEquals(7, Moment.endOfWeek(DateTime.now().withDayOfWeek(6)).getDayOfWeek());
-    assertEquals(7, Moment.endOfWeek(DateTime.now().withDayOfWeek(7)).getDayOfWeek());
-  }
-
-  @Test
   public void next_monday() {
     assertEquals(
         DateTime.parse("2017-05-01").withTimeAtStartOfDay(),
@@ -202,13 +191,13 @@ public class MomentTest {
     assertEquals(Moment.THIS_WEEK, Moment.getForLocale(Locale.GERMAN, "diese woche"));
     assertEquals(Moment.NEXT_WEEK, Moment.getForLocale(Locale.GERMAN, "nächste woche"));
 
-    assertEquals(Moment.MONDAY, Moment.getForLocale(Locale.GERMAN, "montag"));
-    assertEquals(Moment.TUESDAY, Moment.getForLocale(Locale.GERMAN, "dienstag"));
-    assertEquals(Moment.WEDNESDAY, Moment.getForLocale(Locale.GERMAN, "mittwoch"));
-    assertEquals(Moment.THURSDAY, Moment.getForLocale(Locale.GERMAN, "donnerstag"));
-    assertEquals(Moment.FRIDAY, Moment.getForLocale(Locale.GERMAN, "freitag"));
-    assertEquals(Moment.SATURDAY, Moment.getForLocale(Locale.GERMAN, "samstag"));
-    assertEquals(Moment.SUNDAY, Moment.getForLocale(Locale.GERMAN, "sonntag"));
+    assertEquals(Moment.MONDAY, Moment.getForLocale(Locale.GERMAN, "diesen montag"));
+    assertEquals(Moment.TUESDAY, Moment.getForLocale(Locale.GERMAN, "diesen dienstag"));
+    assertEquals(Moment.WEDNESDAY, Moment.getForLocale(Locale.GERMAN, "diesen mittwoch"));
+    assertEquals(Moment.THURSDAY, Moment.getForLocale(Locale.GERMAN, "diesen donnerstag"));
+    assertEquals(Moment.FRIDAY, Moment.getForLocale(Locale.GERMAN, "diesen freitag"));
+    assertEquals(Moment.SATURDAY, Moment.getForLocale(Locale.GERMAN, "diesen samstag"));
+    assertEquals(Moment.SUNDAY, Moment.getForLocale(Locale.GERMAN, "diesen sonntag"));
 
     assertEquals(Moment.NEXT_MONDAY, Moment.getForLocale(Locale.GERMAN, "nächsten montag"));
     assertEquals(Moment.NEXT_TUESDAY, Moment.getForLocale(Locale.GERMAN, "nächsten dienstag"));

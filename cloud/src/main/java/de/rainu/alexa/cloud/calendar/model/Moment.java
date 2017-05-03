@@ -97,12 +97,12 @@ public enum Moment {
 
   THIS_WEEK(
       () -> DateTime.now(),
-      () -> endOfWeek(DateTime.now().withTimeAtStartOfDay()),
+      () -> DateTime.now().withDayOfWeek(7).withTimeAtStartOfDay(),
       new SimpleEntry(Locale.GERMAN, "diese woche")),
 
   NEXT_WEEK(
       () -> DateTime.now().plusWeeks(1).withDayOfWeek(1).withTimeAtStartOfDay(),
-      () -> endOfWeek(DateTime.now().plusWeeks(1).withTimeAtStartOfDay()),
+      () -> DateTime.now().withDayOfWeek(7).plusWeeks(1).withTimeAtStartOfDay(),
       new SimpleEntry(Locale.GERMAN, "nächste woche"));
 
   private final Map<Locale, String> names;
@@ -143,11 +143,6 @@ public enum Moment {
 
       time = time.plusDays(1);
     }
-  }
-
-  static DateTime endOfWeek(DateTime time) {
-    DateTime result = time.plusDays(7 - time.getDayOfWeek());
-    return result;
   }
 
   public static Moment getForLocale(Locale locale, String moment){

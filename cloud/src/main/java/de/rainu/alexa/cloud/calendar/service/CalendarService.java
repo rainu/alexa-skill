@@ -61,7 +61,6 @@ public class CalendarService {
           return calendar.readAgenda(from, to).stream()
               .flatMap(rawEvent -> parser.parseEvent(rawEvent).stream())
               .map(vEvent -> mapper.map(vEvent, calendar.getDefaultTimeZone()))
-              .sorted(Comparator.comparing(Event::getStart))
               .collect(Collectors.toList());
         });
 
@@ -71,6 +70,7 @@ public class CalendarService {
       for(Future<List<Event>> future : futures) {
         allEvents.addAll(future.get());
       }
+      allEvents.sort(Comparator.comparing(Event::getStart));
 
       return allEvents;
     } catch (Exception e) {
@@ -86,12 +86,12 @@ public class CalendarService {
    */
   public List<Event> getNextEvents() throws CalendarReadException {
     final DateTime from = DateTime.now();
-    final DateTime to = from.plusWeeks(1);
+    final DateTime to = from.plusWeeks(1).plusDays(1).withTimeAtStartOfDay();
 
     return getEvents(from, to);
   }
 
-  public Map<String, CalendarCLIAdapter> getCalendars(){
+  Map<String, CalendarCLIAdapter> getCalendars(){
     if(calendars == null) {
       calendars = context.getBeansOfType(CalendarCLIAdapter.class);
     }

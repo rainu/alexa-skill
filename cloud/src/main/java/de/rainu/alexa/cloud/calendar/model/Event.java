@@ -12,6 +12,13 @@ public class Event {
   private String summary;
   private String description;
 
+  public Event() {
+  }
+
+  public Event(DateTime start) {
+    this.start = start;
+  }
+
   public DateTime getStart() {
     return start;
   }
