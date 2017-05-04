@@ -29,8 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
  * This class is responsible for handling all incoming requests.
  */
 @RestController
-@RequestMapping("/cloud/calendar")
+@RequestMapping(CalendarSpeechlet.ENDPOINT)
 public class CalendarSpeechlet extends AbstractSpeechletDispatcher {
+  public static final String ENDPOINT = "/cloud/calendar";
+
   private static final Logger log = LoggerFactory.getLogger(CalendarSpeechlet.class);
 
   @Autowired
