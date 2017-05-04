@@ -1,7 +1,18 @@
 # cloud module
 This module contains features for (next/own)cloud. At the moment only the feature of CalDAV.
 
-# how to configure
+# how to configure alexa
+
+* login to [amazon developer](http://developer.amazon.com)
+* go to _alexa_ tab
+* go to _alexa skills kit_ item
+* add a new skill
+  * _Skill Type_: custom interaction model
+  * _Language_: german
+  * _Name_: any name
+  * _Interaction Model_: paste the code from __resources/alexa_skill_definition.json__
+
+# how to configure server
 
 This module can connect to multiple calendars. It reads the environment variables for configuration. In the following
 table you can find the base environment variables you have to define.
