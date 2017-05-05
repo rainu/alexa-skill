@@ -1,0 +1,3 @@
+[submodule "alexa-skills-kit-java"]
+	path = alexa-skills-kit-java
+	url = git@github.com:rainu/alexa-skills-kit-java.git

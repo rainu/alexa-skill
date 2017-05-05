@@ -14,6 +14,11 @@
   </properties>
 
   <modules>
+    <!--
+      For this module you have to clone a git submodule:
+      git submodule add https://github.com/rainu/alexa-skill.git
+    -->
+    <module>alexa-skills-kit-java</module>
     <module>server</module>
     <module>hello</module>
     <module>cloud</module>
