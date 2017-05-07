@@ -17,7 +17,10 @@
       "samples": [
         "was {precision} {day} ansteht.",
         "was {precision} {day} zu tun ist.",
-        "was {precision} {day} abgeht."
+        "was {precision} {day} abgeht.",
+        "Was steht {precision} {day} an.",
+        "Was ist {precision} {day} zu tun.",
+        "Was geht {precision} {day} ab."
       ],
       "slots": [
         {
@@ -37,7 +40,10 @@
       "samples": [
         "was {near} abgeht.",
         "was {near} zu tun ist.",
-        "was {near} ansteht."
+        "was {near} ansteht.",
+        "Was geht {near} ab.",
+        "Was ist {near} zu tun.",
+        "Was steht {near} an."
       ],
       "slots": [
         {
@@ -52,7 +58,10 @@
       "samples": [
         "was nächste Woche ansteht.",
         "was nächste Woche zu tun ist.",
-        "was nächste Woche abgeht."
+        "was nächste Woche abgeht.",
+        "Was steht nächste Woche an.",
+        "Was ist nächste Woche zu tun.",
+        "Was geht nächste Woche ab."
       ],
       "slots": []
     },
@@ -61,16 +70,78 @@
       "samples": [
         "was diese Woche ansteht.",
         "was diese Woche zu tun ist.",
-        "was diese Woche abgeht."
+        "was diese Woche abgeht.",
+        "Was steht diese Woche an.",
+        "Was ist diese Woche zu tun.",
+        "Was geht diese Woche ab."
       ],
       "slots": []
+    },
+    {
+      "name": "NewEvent",
+      "samples": [
+        "und erstelle einen neuen Termin.",
+        "und lege einen neuen Termin an.",
+        "und erstelle einen Termin.",
+        "und lege einen Termin an.",
+        "Erstelle einen Termin.",
+        "Erstelle einen neuen Termin.",
+        "Lege einen Termin an.",
+        "Lege einen neuen Termin an."
+      ],
+      "slots": [
+        {
+          "name": "date",
+          "type": "AMAZON.DATE",
+          "samples": [
+            "Am {date}.",
+            "Für den {date}.",
+            "Für {date}.",
+            "Für {date} um {time}.",
+            "Für den {date} um {time}.",
+            "Am {date} um {time}."
+          ]
+        },
+        {
+          "name": "time",
+          "type": "AMAZON.TIME",
+          "samples": [
+            "Um {time} Uhr.",
+            "Um {time}.",
+            "Um {time} für {duration}.",
+            "Um {time} Uhr für {duration}."
+          ]
+        },
+        {
+          "name": "duration",
+          "type": "AMAZON.DURATION",
+          "samples": [
+            "{duration}",
+            "Er dauert {duration}."
+          ]
+        },
+        {
+          "name": "summary",
+          "type": "TerminTitel",
+          "samples": [
+            "{summary}",
+            "Der Termin soll {summary} heißen.",
+            "Er soll {summary} heißen.",
+            "Der Termin soll {summary} lauten.",
+            "Er soll {summary} lauten."
+          ]
+        }
+      ]
     },
     {
       "name": "NextEvents",
       "samples": [
         "was ansteht.",
         "was zu tun ist.",
-        "was abgeht."
+        "was abgeht.",
+        "Was steht an.",
+        "Was gibt es zu tun.",
+        "Was geht ab."
       ],
       "slots": []
     }
@@ -165,20 +236,34 @@
           }
         }
       ]
+    },
+    {
+      "name": "TerminTitel",
+      "values": [
+        {
+          "name": {
+            "value": "Termin"
+          }
+        },
+        {
+          "name": {
+            "value": "Titel"
+          }
+        },
+        {
+          "name": {
+            "value": "Todo"
+          }
+        },
+        {
+          "name": {
+            "value": "Geburtstag"
+          }
+        }
+      ]
     }
   ],
   "prompts": [
-    {
-      "id": "Elicit.Intent-EventQuery.IntentSlot-precision",
-      "promptVersion": "1.0",
-      "definitionVersion": "1.0",
-      "variations": [
-        {
-          "type": "PlainText",
-          "value": "Für welchen Zeitraum möchtest du Termine erfahren?"
-        }
-      ]
-    },
     {
       "id": "Elicit.Intent-EventQuery.IntentSlot-day",
       "promptVersion": "1.0",
@@ -186,7 +271,7 @@
       "variations": [
         {
           "type": "PlainText",
-          "value": "Für welchen Zeitraum möchtest du Termine erfahren?"
+          "value": "Für welchen Tag soll ich den Termin einstragen?"
         }
       ]
     },
@@ -197,7 +282,82 @@
       "variations": [
         {
           "type": "PlainText",
-          "value": "Für welchen Zeitraum möchtest du Termine erfahren?"
+          "value": "Für welchen Zeitraum möchtest du Termine erfahren."
+        }
+      ]
+    },
+    {
+      "id": "Confirm.Intent-NewEvent",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Soll ich diesen Termin von {date} bis {duration} so speichern?"
+        },
+        {
+          "type": "PlainText",
+          "value": "Soll ich den Termin von {date} bis {duration} so erstellen?"
+        },
+        {
+          "type": "PlainText",
+          "value": "Kann ich den Termin von {date} bis {duration} speichern?"
+        },
+        {
+          "type": "PlainText",
+          "value": "Kann ich den Termin von {date} bis {duration} erstellen?"
+        },
+        {
+          "type": "PlainText",
+          "value": "Kann ich den Termin von {date} bis {duration} anlegen?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-NewEvent.IntentSlot-date",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Für welchen Tag soll ich den Termin eintragen?"
+        },
+        {
+          "type": "PlainText",
+          "value": "Für wann soll ich den Termin eintragen?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-NewEvent.IntentSlot-time",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Um welche Uhrzeit soll der Termin stattfinden?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-NewEvent.IntentSlot-duration",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Wie lange dauert der Termin?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-NewEvent.IntentSlot-summary",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Wie soll der Termin heißen?"
         }
       ]
     }
@@ -213,11 +373,9 @@
           {
             "name": "precision",
             "type": "PraezisionFuerTag",
-            "elicitationRequired": true,
+            "elicitationRequired": false,
             "confirmationRequired": false,
-            "prompts": {
-              "elicit": "Elicit.Intent-EventQuery.IntentSlot-precision"
-            }
+            "prompts": {}
           },
           {
             "name": "day",
@@ -257,6 +415,51 @@
         "confirmationRequired": false,
         "prompts": {},
         "slots": []
+      },
+      {
+        "name": "NewEvent",
+        "confirmationRequired": true,
+        "prompts": {
+          "confirm": "Confirm.Intent-NewEvent"
+        },
+        "slots": [
+          {
+            "name": "date",
+            "type": "AMAZON.DATE",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-NewEvent.IntentSlot-date"
+            }
+          },
+          {
+            "name": "time",
+            "type": "AMAZON.TIME",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-NewEvent.IntentSlot-time"
+            }
+          },
+          {
+            "name": "duration",
+            "type": "AMAZON.DURATION",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-NewEvent.IntentSlot-duration"
+            }
+          },
+          {
+            "name": "summary",
+            "type": "TerminTitel",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-NewEvent.IntentSlot-summary"
+            }
+          }
+        ]
       },
       {
         "name": "NextEvents",

@@ -3,8 +3,12 @@ package de.rainu.alexa.cloud.speechlet;
 import com.amazon.speech.slu.Slot;
 import com.amazon.speech.speechlet.IntentRequest;
 import com.amazon.speech.speechlet.LaunchRequest;
+import com.amazon.speech.speechlet.Session;
 import com.amazon.speech.speechlet.SpeechletResponse;
+import com.amazon.speech.speechlet.interfaces.dialog.directive.DelegateDirective;
 import com.amazon.speech.ui.OutputSpeech;
+import com.amazon.speech.ui.PlainTextOutputSpeech;
+import com.amazon.speech.ui.Reprompt;
 import de.rainu.alexa.annotation.OnIntent;
 import de.rainu.alexa.annotation.OnLaunch;
 import de.rainu.alexa.cloud.calendar.exception.CalendarReadException;
@@ -12,6 +16,7 @@ import de.rainu.alexa.cloud.calendar.exception.UnknownMomentException;
 import de.rainu.alexa.cloud.calendar.model.Event;
 import de.rainu.alexa.cloud.calendar.model.Moment;
 import de.rainu.alexa.cloud.calendar.service.CalendarService;
+import de.rainu.alexa.cloud.calendar.service.NewEventDialogService;
 import de.rainu.alexa.cloud.service.SpeechService;
 import de.rainu.alexa.speechlet.AbstractSpeechletDispatcher;
 import java.util.List;
@@ -33,6 +38,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class CalendarSpeechlet extends AbstractSpeechletDispatcher {
   public static final String ENDPOINT = "/cloud/calendar";
 
+  private static final String KEY_DIALOG_TYPE = "dialog-type";
+  private static final String DIALOG_TYPE_NEW_EVENT = "new-event";
+
   private static final Logger log = LoggerFactory.getLogger(CalendarSpeechlet.class);
 
   @Autowired
@@ -40,6 +48,9 @@ public class CalendarSpeechlet extends AbstractSpeechletDispatcher {
 
   @Autowired
   SpeechService speechService;
+
+  @Autowired
+  NewEventDialogService newEventDialogService;
 
   /**
    * Creates and returns a {@code SpeechletResponse} with a welcome message.
@@ -50,7 +61,7 @@ public class CalendarSpeechlet extends AbstractSpeechletDispatcher {
   public SpeechletResponse getWelcomeResponse(final LaunchRequest request) {
     final OutputSpeech speech = speechService.speechWelcomeMessage(request.getLocale());
 
-    return SpeechletResponse.newTellResponse(speech);
+    return SpeechletResponse.newAskResponse(speech, new Reprompt());
   }
 
   /**
@@ -63,6 +74,26 @@ public class CalendarSpeechlet extends AbstractSpeechletDispatcher {
     final OutputSpeech speech = speechService.speechHelpMessage(request.getLocale());
 
     return SpeechletResponse.newTellResponse(speech);
+  }
+
+  @OnIntent("AMAZON.CancelIntent")
+  public SpeechletResponse cancel(final IntentRequest request, final Session session) {
+    final OutputSpeech speech;
+
+    if(DIALOG_TYPE_NEW_EVENT.equals(session.getAttribute(KEY_DIALOG_TYPE))){
+      speech = speechService.speechCancelNewEvent(request.getLocale());
+    } else {
+      speech = speechService.speechGeneralConfirmation(request.getLocale());
+    }
+
+    return SpeechletResponse.newTellResponse(speech);
+  }
+
+  @OnIntent("NewEvent")
+  public SpeechletResponse startNewEvent(final IntentRequest request, final Session session){
+    session.setAttribute(KEY_DIALOG_TYPE, DIALOG_TYPE_NEW_EVENT);
+
+    return newEventDialogService.handleDialogAction(request, session);
   }
 
   @OnIntent("NextEvents")

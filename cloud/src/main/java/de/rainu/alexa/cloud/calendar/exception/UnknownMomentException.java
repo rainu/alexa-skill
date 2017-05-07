@@ -9,4 +9,8 @@ public class UnknownMomentException extends AlexaExcpetion {
   public UnknownMomentException() {
     super(ERROR_MESSAGE_KEY, "");
   }
+
+  public UnknownMomentException(String messageKey, Throwable cause) {
+    super(messageKey, "", cause);
+  }
 }

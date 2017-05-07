@@ -31,6 +31,11 @@ public class SpeechService {
     return speechMessage(speechText);
   }
 
+  public OutputSpeech speechGeneralConfirmation(Locale locale) {
+    final String speechText = messageService.de("confirm");
+    return speechMessage(speechText);
+  }
+
   public OutputSpeech readEvents(Locale locale, List<Event> events) {
     return readEvents(locale, "", events);
   }
@@ -41,7 +46,7 @@ public class SpeechService {
       return speechMessage(speechText);
     }
 
-    StringBuilder sb = new StringBuilder(messageService.de("event.start", moment));
+    StringBuilder sb = new StringBuilder(messageService.de("event.listing.start", moment));
     for (Event event : events) {
       sb.append("<break time=\"500ms\"/>");
       sb.append(generateSpeechText(locale, event));
@@ -146,6 +151,11 @@ public class SpeechService {
         event.getSummary());
   }
 
+  public OutputSpeech speechCancelNewEvent(Locale locale) {
+    final String speechText = messageService.de("event.new.cancel");
+    return speechMessage(speechText);
+  }
+
   public OutputSpeech speechError(Throwable t) {
     final String speechText;
     if (t instanceof AlexaExcpetion) {
@@ -172,5 +182,31 @@ public class SpeechService {
 
       return speech;
     }
+  }
+
+  public OutputSpeech confirmNewEvent(DateTime from, DateTime to, Locale locale) {
+    final String speechText;
+    if(from.getYear() == to.getYear() && from.getDayOfYear() == to.getDayOfYear()) {
+      speechText = messageService.de("event.new.confirm.sameday",
+          from.toString(DAY_FORMAT, locale),
+          from.toString(DATE_FORMAT),
+          from.toString(TIME_FORMAT),
+          to.toString(TIME_FORMAT));
+    } else {
+      speechText = messageService.de("event.new.confirm",
+          from.toString(DAY_FORMAT, locale),
+          from.toString(DATE_FORMAT),
+          from.toString(TIME_FORMAT),
+          to.toString(DAY_FORMAT, locale),
+          to.toString(DATE_FORMAT),
+          to.toString(TIME_FORMAT));
+    }
+
+    return speechMessage(speechText);
+  }
+
+  public OutputSpeech speechNewEventSaved(Locale locale) {
+    final String speechText = messageService.de("event.new.saved");
+    return speechMessage(speechText);
   }
 }
