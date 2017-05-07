@@ -41,3 +41,53 @@ You can configure multiple calendars. Just put a number (begining by zero) betwe
 | CALDAV_1_USER | rainu |
 | CALDAV_1_PASSWORD | secret |
 | CALDAV_1_CALENDAR_URL | calendars/rainu/456213af |
+
+# what can i say to alexa?
+
+## get a list events (german):
+
+* Alexa, frage _skill_ was __query__ ansteht.
+* Alexa, frage _skill_ was __query__ zu tun ist.
+* Alexa, frage _skill_ was __query__ abgeht.
+
+* Alexa, starte _skill_.
+  * Was steht __query__ an?
+  * Was ist __query__ zu tun?
+  * Was geht __query__ ab?
+  
+Where __query__ can be the following:
+* (nothing)
+* heute
+* morgen
+* übermorgen
+* diese Woche
+* diesen Montag
+* diesen Dienstag
+* diesen Mittwoch
+* diesen Donnerstag
+* diesen Freitag
+* diesen Samstag
+* diesen Sonntag
+* nächste Woche
+* nächsten Montag
+* nächsten Dienstag
+* nächsten Mittwoch
+* nächsten Donnerstag
+* nächsten Freitag
+* nächsten Samstag
+* nächsten Sonntag
+
+## create a new event (german):
+
+* Alexa, starte _skill_ und erstelle einen neuen Termin.
+* Alexa, starte _skill_ und lege einen neuen Termin an.
+* Alexa, starte _skill_ und erstelle einen Termin.
+* Alexa, starte _skill_ und lege einen Termin an.
+
+* Alexa, starte _skill_.
+  * Erstelle einen Termin.
+  * Erstelle einen neuen Termin.
+  * Lege einen Termin an.
+  * Lege einen neuen Termin an.
+  
+Alexa will start a dialog with you where she ask you about event information.

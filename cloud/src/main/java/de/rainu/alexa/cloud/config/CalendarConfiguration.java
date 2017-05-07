@@ -29,6 +29,8 @@ public class CalendarConfiguration implements BeanFactoryAware {
   public static final String ENVIRONMENT_SUFFIX_CALENDAR_NAME = "NAME";
   public static final String ENVIRONMENT_SUFFIX_TIMEZONE = "TIMEZONE";
 
+  public static String NAME_OF_DEFAULT_CALENDAR;
+
   ConfigurableBeanFactory beanFactory;
 
   @Override
@@ -61,6 +63,11 @@ public class CalendarConfiguration implements BeanFactoryAware {
         final String calendarName = relevantEnv.get(env(i, ENVIRONMENT_SUFFIX_CALENDAR_NAME));
         final String timezone = relevantEnv.get(env(i, ENVIRONMENT_SUFFIX_TIMEZONE));
 
+        if(i==0){
+          //the first calendar is the default calendar
+          NAME_OF_DEFAULT_CALENDAR = calendarName;
+        }
+
         check(caldavURL, i, ENVIRONMENT_SUFFIX_CALDAV_URL);
         check(calendarName, i, ENVIRONMENT_SUFFIX_CALENDAR_NAME);
         check(caldavUser, i, ENVIRONMENT_SUFFIX_CALDAV_USER);
@@ -76,6 +83,8 @@ public class CalendarConfiguration implements BeanFactoryAware {
       final String calendarURL = relevantEnv.get(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_CALENDAR_URL);
       final String calendarName = relevantEnv.get(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_CALENDAR_NAME);
       final String timezone = relevantEnv.get(ENVIRONMENT_PREFIX + ENVIRONMENT_SUFFIX_TIMEZONE);
+
+      NAME_OF_DEFAULT_CALENDAR = calendarName;
 
       check(caldavURL, null, ENVIRONMENT_SUFFIX_CALDAV_URL);
       check(calendarName, null, ENVIRONMENT_SUFFIX_CALENDAR_NAME);

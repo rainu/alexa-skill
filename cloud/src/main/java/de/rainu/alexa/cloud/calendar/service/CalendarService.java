@@ -6,7 +6,10 @@ import de.rainu.alexa.cloud.calendar.CalendarCLIAdapter;
 import de.rainu.alexa.cloud.calendar.EventMapper;
 import de.rainu.alexa.cloud.calendar.ICalendarParser;
 import de.rainu.alexa.cloud.calendar.exception.CalendarReadException;
+import de.rainu.alexa.cloud.calendar.exception.CalendarWriteException;
 import de.rainu.alexa.cloud.calendar.model.Event;
+import de.rainu.alexa.cloud.config.CalendarConfiguration;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -89,6 +92,31 @@ public class CalendarService {
     final DateTime to = from.plusWeeks(1).plusDays(1).withTimeAtStartOfDay();
 
     return getEvents(from, to);
+  }
+
+  /**
+   * Create a new event.
+   *
+   * @param calendarName the target calendar. null means the default calendar (first created)
+   * @param summary the summary of event
+   * @param from Startdate of event
+   * @param to Enddate of event
+   * @return a uuid of the created events.
+   * @throws CalendarWriteException If an error occurs while writing calendars.
+   */
+  public String createEvent(
+      final String calendarName,
+      final String summary,
+      final DateTime from, final DateTime to) throws CalendarWriteException {
+
+    final String targetCalendar = calendarName != null ? calendarName : CalendarConfiguration.NAME_OF_DEFAULT_CALENDAR;
+    final CalendarCLIAdapter cli = getCalendars().get(targetCalendar);
+
+    try {
+      return cli.createEvent(summary, from, to);
+    } catch (IOException e) {
+      throw new CalendarWriteException("Could not write event into calendar '" + targetCalendar + "'.", e);
+    }
   }
 
   Map<String, CalendarCLIAdapter> getCalendars(){

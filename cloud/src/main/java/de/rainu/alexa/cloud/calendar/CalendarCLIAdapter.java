@@ -8,10 +8,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +32,8 @@ public class CalendarCLIAdapter {
   private final String caldavPassword;
   private final String calendarURL;
   private final TimeZone calendarTimeZone;
+
+  private final static Pattern eventUUID = Pattern.compile("uid=([0-9a-fA-F-]*)");
 
   private static Map<String, String> env;
   static {
@@ -102,6 +108,43 @@ public class CalendarCLIAdapter {
     }
 
     return rawEvents;
+  }
+
+  /**
+   * Creates a event in this calendar.
+   *
+   * @param summary the summary of event
+   * @param from Startdate of event
+   * @param to Enddate of event
+   * @return a uuid of the created events.
+   * @throws IOException If the underlying process was failed.
+   */
+  public String createEvent(final String summary, final DateTime from, final DateTime to) throws IOException {
+    List<String> subCommands = new ArrayList<>();
+
+    subCommands.add("calendar");
+    subCommands.add("add");
+
+    final Duration duration = new Interval(from, to).toDuration();
+    final StringBuilder eventTime = new StringBuilder();
+    eventTime.append(from.toString("yyyy-MM-dd'T'HH:mm"));
+    eventTime.append("+");
+    eventTime.append(duration.getStandardMinutes());
+    eventTime.append("m");
+
+    subCommands.add(eventTime.toString());
+    subCommands.add(summary);
+
+    final String rawOutput = execute(subCommands);
+    final String uid;
+    final Matcher matcher = eventUUID.matcher(rawOutput);
+    if(matcher.find()) {
+      uid = matcher.group(1);
+    }else{
+      uid = "<unknown>";
+    }
+
+    return uid;
   }
 
   private String execute(List<String> subCommands) throws IOException {

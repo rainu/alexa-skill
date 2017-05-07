@@ -5,13 +5,12 @@ import com.amazon.speech.speechlet.IntentRequest;
 import com.amazon.speech.speechlet.LaunchRequest;
 import com.amazon.speech.speechlet.Session;
 import com.amazon.speech.speechlet.SpeechletResponse;
-import com.amazon.speech.speechlet.interfaces.dialog.directive.DelegateDirective;
 import com.amazon.speech.ui.OutputSpeech;
-import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.amazon.speech.ui.Reprompt;
 import de.rainu.alexa.annotation.OnIntent;
 import de.rainu.alexa.annotation.OnLaunch;
 import de.rainu.alexa.cloud.calendar.exception.CalendarReadException;
+import de.rainu.alexa.cloud.calendar.exception.CalendarWriteException;
 import de.rainu.alexa.cloud.calendar.exception.UnknownMomentException;
 import de.rainu.alexa.cloud.calendar.model.Event;
 import de.rainu.alexa.cloud.calendar.model.Moment;
@@ -90,10 +89,15 @@ public class CalendarSpeechlet extends AbstractSpeechletDispatcher {
   }
 
   @OnIntent("NewEvent")
-  public SpeechletResponse startNewEvent(final IntentRequest request, final Session session){
+  public SpeechletResponse newEvent(final IntentRequest request, final Session session) {
+
     session.setAttribute(KEY_DIALOG_TYPE, DIALOG_TYPE_NEW_EVENT);
 
-    return newEventDialogService.handleDialogAction(request, session);
+    try {
+      return newEventDialogService.handleDialogAction(request, session);
+    } catch (CalendarWriteException e) {
+      return SpeechletResponse.newTellResponse(speechService.speechError(e));
+    }
   }
 
   @OnIntent("NextEvents")

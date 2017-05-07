@@ -60,6 +60,7 @@ public class MessageConfiguration {
     m.put("event.error.unknown.date", "Es tut mir leid. Das Datum habe ich nicht verstanden.");
     m.put("event.error.unknown.time", "Es tut mir leid. Diese Uhrzeit habe ich nicht verstanden.");
     m.put("event.error.read", "Es tut mir leid. Ich konnte die Termine nicht auslesen.");
+    m.put("event.error.write", "Es tut mir leid. Ich konnte den Termin nicht speichern.");
     m.put("event.error.understand", "Es tut mir leid. Das habe ich nicht verstanden.");
 
     return Collections.unmodifiableMap(m);
