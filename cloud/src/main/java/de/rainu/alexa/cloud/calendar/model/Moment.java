@@ -97,12 +97,12 @@ public enum Moment {
 
   THIS_WEEK(
       () -> DateTime.now(),
-      () -> DateTime.now().withDayOfWeek(7).withTimeAtStartOfDay(),
+      () -> DateTime.now().withDayOfWeek(7).plusDays(1).withTimeAtStartOfDay(),
       new SimpleEntry(Locale.GERMAN, "diese woche")),
 
   NEXT_WEEK(
       () -> DateTime.now().plusWeeks(1).withDayOfWeek(1).withTimeAtStartOfDay(),
-      () -> DateTime.now().withDayOfWeek(7).plusWeeks(1).withTimeAtStartOfDay(),
+      () -> DateTime.now().withDayOfWeek(7).plusWeeks(1).plusDays(1).withTimeAtStartOfDay(),
       new SimpleEntry(Locale.GERMAN, "nächste woche"));
 
   private final Map<Locale, String> names;
