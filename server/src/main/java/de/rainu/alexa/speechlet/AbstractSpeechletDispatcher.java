@@ -8,6 +8,8 @@ import com.amazon.speech.speechlet.SessionStartedRequest;
 import com.amazon.speech.speechlet.Speechlet;
 import com.amazon.speech.speechlet.SpeechletException;
 import com.amazon.speech.speechlet.SpeechletResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rainu.alexa.annotation.OnIntent;
 import de.rainu.alexa.annotation.OnLaunch;
 import de.rainu.alexa.annotation.OnSessionEnded;
@@ -43,29 +45,72 @@ public abstract class AbstractSpeechletDispatcher implements Speechlet {
   }
 
   public final void onSessionStarted(final SessionStartedRequest request, final Session session) throws SpeechletException {
-    log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
+    log.info("onSessionStarted\n\trequestId={}\n\tuserId={}\n\tsession=[id => {}, attributes => {}]",
+        request.getRequestId(),
+        session.getUser().getUserId(),
+        session.getSessionId(),
+        session.getAttributes());
+
     call(OnSessionStarted.class, request, session);
   }
 
   public final SpeechletResponse onLaunch(final LaunchRequest request, final Session session) throws SpeechletException {
-    log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
-    return callLaunch(request, session);
+    log.info("onLaunch\n\trequestId={}\n\tuserId={}\n\tsession=[id => {}, attributes => {}]",
+        request.getRequestId(),
+        session.getUser().getUserId(),
+        session.getSessionId(),
+        session.getAttributes());
+
+    final long time = System.currentTimeMillis();
+    final SpeechletResponse speechletResponse = callLaunch(request, session);
+
+    try {
+      log.info("response onLaunch\n\trequestId={}\n\tduration={}ms\n\tresponse={}",
+          request.getRequestId(),
+          (System.currentTimeMillis() - time),
+          new ObjectMapper().writeValueAsString(speechletResponse));
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+
+    return speechletResponse;
   }
 
   public final SpeechletResponse onIntent(final IntentRequest request, final Session session) throws SpeechletException {
-    log.info("onIntent requestId={}, sessionId={}, intent-name={}, intent-slots={{}}",
+    log.info("onIntent\n\trequestId={}\n\tdialogState={}\n\tuserId={}\n\tsession=[id => {}, attributes => {}]\n\tintent=[name => {}({})]\n\tintent-slots={{}}",
         request.getRequestId(),
+        request.getDialogState(),
+        session.getUser().getUserId(),
         session.getSessionId(),
+        session.getAttributes(),
         request.getIntent().getName(),
+        request.getIntent().getConfirmationStatus(),
         request.getIntent().getSlots().values().stream()
-            .map(s -> "[" + s.getName() + " => " + s.getValue() + "]")
+            .map(s -> "[" + s.getName() + " => " + s.getValue() + "(" + s.getConfirmationStatus() + ")]")
             .collect(Collectors.joining(", ")));
 
-    return callIntent(request, session);
+    final long time = System.currentTimeMillis();
+    final SpeechletResponse speechletResponse = callIntent(request, session);
+
+    try {
+      log.info("response onIntent\n\trequestId={}\n\tduration={}ms\n\tresponse={}",
+          request.getRequestId(),
+          (System.currentTimeMillis() - time),
+          new ObjectMapper().writeValueAsString(speechletResponse));
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+
+    return speechletResponse;
   }
 
   public final void onSessionEnded(final SessionEndedRequest request, final Session session) throws SpeechletException {
-    log.info("onSessionEnded requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
+    log.info("onSessionEnded\n\trequestId={}\n\tuserId={}\n\tsession=[id => {}, attributes => {}]",
+        request.getRequestId(),
+        session.getUser().getUserId(),
+        session.getSessionId(),
+        session.getAttributes());
+
     call(OnSessionEnded.class, request, session);
   }
 
