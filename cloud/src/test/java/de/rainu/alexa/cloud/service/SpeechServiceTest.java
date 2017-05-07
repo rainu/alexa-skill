@@ -2,6 +2,7 @@ package de.rainu.alexa.cloud.service;
 
 import static org.junit.Assert.assertEquals;
 
+import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.amazon.speech.ui.SsmlOutputSpeech;
 import de.rainu.alexa.cloud.calendar.exception.CalendarReadException;
@@ -34,7 +35,7 @@ public class SpeechServiceTest {
     final PlainTextOutputSpeech result = (PlainTextOutputSpeech)toTest.speechWelcomeMessage(aLocale);
 
     //then
-    assertEquals("Willkommen in deinem Kalender. Du kannst hier Termine erfragen und erstellen.", result.getText());
+    assertEquals("Willkommen in deinem Kalender.", result.getText());
   }
 
   @Test
@@ -44,7 +45,7 @@ public class SpeechServiceTest {
     final PlainTextOutputSpeech result = (PlainTextOutputSpeech)toTest.speechHelpMessage(aLocale);
 
     //then
-    assertEquals("Frage mich: was ansteht, um die aktuellen Termine zu erfahren.", result.getText());
+    assertEquals("Frage mich: was ansteht, um die aktuellen Termine zu erfahren. Oder trage einen neuen Termin ein.", result.getText());
   }
 
   @Test
@@ -260,5 +261,55 @@ public class SpeechServiceTest {
         end.toString("HH:mm"),
         event.getSummary()
     ), result.getSsml());
+  }
+
+  @Test
+  public void confirmNewEvent_sameDay() {
+    //given
+    final DateTime from = DateTime.parse("2010-08-13T20:15");
+    final DateTime to = from.plusHours(1);
+
+    //when
+    final SsmlOutputSpeech result = (SsmlOutputSpeech)toTest.confirmNewEvent(from, to, aLocale);
+
+    //then
+    assertEquals(String.format("<speak>Kann ich den Termin am %s, den <say-as interpret-as=\"date\" format=\"dmy\">%s</say-as> von %s Uhr bis %s Uhr speichern?</speak>",
+      "Freitag", "13.08.2010", "20:15", "21:15"
+    ), result.getSsml());
+  }
+
+  @Test
+  public void confirmNewEvent_differentDay() {
+    //given
+    final DateTime from = DateTime.parse("2010-08-13T20:15");
+    final DateTime to = from.plusHours(1).plusDays(1);
+
+    //when
+    final SsmlOutputSpeech result = (SsmlOutputSpeech)toTest.confirmNewEvent(from, to, aLocale);
+
+    //then
+    assertEquals(String.format("<speak>Kann ich den Termin von %s, den <say-as interpret-as=\"date\" format=\"dmy\">%s</say-as> um %s Uhr bis %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> um %s Uhr speichern?</speak>",
+        "Freitag", "13.08.2010", "20:15", "Samstag", "14.08.2010", "21:15"
+    ), result.getSsml());
+  }
+
+  @Test
+  public void speechNewEventSaved(){
+    //given
+    //when
+    final PlainTextOutputSpeech result = (PlainTextOutputSpeech)toTest.speechNewEventSaved(aLocale);
+
+    //then
+    assertEquals("OK. Ich habe den Termin gespeichert.", result.getText());
+  }
+
+  @Test
+  public void speechGeneralConfirmation(){
+    //given
+    //when
+    final PlainTextOutputSpeech result = (PlainTextOutputSpeech)toTest.speechGeneralConfirmation(aLocale);
+
+    //then
+    assertEquals("OK.", result.getText());
   }
 }

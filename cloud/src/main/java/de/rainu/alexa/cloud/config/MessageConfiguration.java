@@ -28,7 +28,7 @@ public class MessageConfiguration {
   public Map<String, String> messages() {
     Map<String, String> m = new HashMap<>();
 
-    m.put("welcome", "OK.");
+    m.put("welcome", "Willkommen in deinem Kalender.");
     m.put("confirm", "OK.");
     m.put("help", "Frage mich: was ansteht, um die aktuellen Termine zu erfahren. Oder trage einen neuen Termin ein.");
 
@@ -44,15 +44,12 @@ public class MessageConfiguration {
     m.put("event.item.date.time.duration", "Am %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> von %s Uhr bis %s Uhr: %s");
     m.put("event.nothing", "Es stehen %s keine Termine an.");
 
-    m.put("event.new.submit.date", "OK, ein Termin am %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as>.");
-    m.put("event.new.submit.date.time", "OK, ein Termin am %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> um %s Uhr.");
-    m.put("event.new.summary", "Wie soll der Termin lauten?");
     m.put("event.new.cancel", "OK. Ich habe den Termin verworfen.");
     m.put("event.new.saved", "OK. Ich habe den Termin gespeichert.");
-    m.put("event.new.confirm", "Kann ich den Termin von %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> um %s Uhr bis %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> um %s Uhr speichern?");
-    m.put("event.new.confirm.sameday", "Kann ich den Termin am %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> von %s Uhr bis %s Uhr speichern?");
+    m.put("event.new.confirm", "Kann ich den Termin von %s, den <say-as interpret-as=\"date\" format=\"dmy\">%s</say-as> um %s Uhr bis %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> um %s Uhr speichern?");
+    m.put("event.new.confirm.sameday", "Kann ich den Termin am %s, den <say-as interpret-as=\"date\" format=\"dmy\">%s</say-as> von %s Uhr bis %s Uhr speichern?");
     m.put("event.new.card.title", "Neuer Termin erstellt");
-    m.put("event.new.card.content", "Titel: %s\nBeginn: %s\nEnde:%s\n");
+    m.put("event.new.card.content", "Titel: %s\nBeginn: %s\nEnde:%s");
     m.put("event.new.card.content.time.format", "dd.MM.yyyy HH:mm");
 
     m.put("event.error", "Es tut mir leid. Es ist leider ein Fehler aufgetreten.");

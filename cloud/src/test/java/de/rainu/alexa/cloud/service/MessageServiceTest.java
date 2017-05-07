@@ -25,7 +25,7 @@ public class MessageServiceTest {
     final String result = toTest.de(messageKey);
 
     //then
-    assertEquals("Frage mich: was ansteht, um die aktuellen Termine zu erfahren.", result);
+    assertEquals("Frage mich: was ansteht, um die aktuellen Termine zu erfahren. Oder trage einen neuen Termin ein.", result);
   }
 
 }

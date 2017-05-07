@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class SpeechService {
 
   private static final String DATE_FORMAT = "dd.MM.";
+  private static final String DATE_YEAR_FORMAT = "dd.MM.yyyy";
   private static final String DAY_FORMAT = "EEEE";
   private static final String TIME_FORMAT = "HH:mm";
 
@@ -189,16 +190,16 @@ public class SpeechService {
     if(from.getYear() == to.getYear() && from.getDayOfYear() == to.getDayOfYear()) {
       speechText = messageService.de("event.new.confirm.sameday",
           from.toString(DAY_FORMAT, locale),
-          from.toString(DATE_FORMAT),
+          from.toString(DATE_YEAR_FORMAT),
           from.toString(TIME_FORMAT),
           to.toString(TIME_FORMAT));
     } else {
       speechText = messageService.de("event.new.confirm",
           from.toString(DAY_FORMAT, locale),
-          from.toString(DATE_FORMAT),
+          from.toString(DATE_YEAR_FORMAT),
           from.toString(TIME_FORMAT),
           to.toString(DAY_FORMAT, locale),
-          to.toString(DATE_FORMAT),
+          to.toString(DATE_YEAR_FORMAT),
           to.toString(TIME_FORMAT));
     }
 

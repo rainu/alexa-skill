@@ -37,8 +37,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CalendarSpeechlet extends AbstractSpeechletDispatcher {
   public static final String ENDPOINT = "/cloud/calendar";
 
-  private static final String KEY_DIALOG_TYPE = "dialog-type";
-  private static final String DIALOG_TYPE_NEW_EVENT = "new-event";
+  protected static final String KEY_DIALOG_TYPE = "dialog-type";
+  protected static final String DIALOG_TYPE_NEW_EVENT = "new-event";
 
   private static final Logger log = LoggerFactory.getLogger(CalendarSpeechlet.class);
 
@@ -90,7 +90,6 @@ public class CalendarSpeechlet extends AbstractSpeechletDispatcher {
 
   @OnIntent("NewEvent")
   public SpeechletResponse newEvent(final IntentRequest request, final Session session) {
-
     session.setAttribute(KEY_DIALOG_TYPE, DIALOG_TYPE_NEW_EVENT);
 
     try {

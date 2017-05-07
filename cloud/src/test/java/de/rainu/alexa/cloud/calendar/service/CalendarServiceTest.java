@@ -5,19 +5,25 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import biweekly.component.VEvent;
+import biweekly.util.com.google.ical.values.DateTimeValueImpl;
 import de.rainu.alexa.cloud.calendar.CalendarCLIAdapter;
 import de.rainu.alexa.cloud.calendar.EventMapper;
 import de.rainu.alexa.cloud.calendar.ICalendarParser;
 import de.rainu.alexa.cloud.calendar.exception.CalendarReadException;
+import de.rainu.alexa.cloud.calendar.exception.CalendarWriteException;
 import de.rainu.alexa.cloud.calendar.model.Event;
+import de.rainu.alexa.cloud.config.CalendarConfiguration;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,7 +80,7 @@ public class CalendarServiceTest {
     assertSame(events, result);
     verify(toTest, times(1)).getEvents(timeCap.capture(), timeCap.capture());
 
-    assertTrue(timeCap.getAllValues().get(0).getMillis() - now.getMillis() <= 100);
+    assertTrue(timeCap.getAllValues().get(0).getMillis() - now.getMillis() <= 1000);
     assertEquals(
         now.plusDays(1).plusWeeks(1).withTimeAtStartOfDay().toString(),
         timeCap.getAllValues().get(1).toString());
@@ -137,5 +143,77 @@ public class CalendarServiceTest {
     event.setSummary(title);
     event.setDateStart(start.toDate());
     return event;
+  }
+
+  @Test
+  public void createEvent_defaultCalendar() throws CalendarWriteException, IOException {
+    //given
+    final String summary = "<summary>";
+    final DateTime from = DateTime.now();
+    final DateTime to = from.plusHours(1);
+
+    Map<String, CalendarCLIAdapter> calendar = new HashMap<>();
+    calendar.put("default", mock(CalendarCLIAdapter.class));
+    calendar.put("sec", mock(CalendarCLIAdapter.class));
+
+    CalendarConfiguration.NAME_OF_DEFAULT_CALENDAR = "default";
+    doReturn(calendar).when(toTest).getCalendars();
+    doReturn("<uid-def>").when(calendar.get("default")).createEvent(any(), any(), any());
+    doReturn("<uid-sec>").when(calendar.get("sec")).createEvent(any(), any(), any());
+
+    //when
+    final String result = toTest.createEvent(null, summary, from, to);
+
+    //then
+    assertEquals("<uid-def>", result);
+    verify(calendar.get("default"), times(1)).createEvent(
+        same(summary), same(from), same(to)
+    );
+    verify(calendar.get("sec"), never()).createEvent(any(), any(), any());
+  }
+
+  @Test
+  public void createEvent_customCalendar() throws CalendarWriteException, IOException {
+    //given
+    final String summary = "<summary>";
+    final DateTime from = DateTime.now();
+    final DateTime to = from.plusHours(1);
+
+    Map<String, CalendarCLIAdapter> calendar = new HashMap<>();
+    calendar.put("default", mock(CalendarCLIAdapter.class));
+    calendar.put("sec", mock(CalendarCLIAdapter.class));
+
+    CalendarConfiguration.NAME_OF_DEFAULT_CALENDAR = "default";
+    doReturn(calendar).when(toTest).getCalendars();
+    doReturn("<uid-def>").when(calendar.get("default")).createEvent(any(), any(), any());
+    doReturn("<uid-sec>").when(calendar.get("sec")).createEvent(any(), any(), any());
+
+    //when
+    final String result = toTest.createEvent("sec", summary, from, to);
+
+    //then
+    assertEquals("<uid-sec>", result);
+    verify(calendar.get("sec"), times(1)).createEvent(
+        same(summary), same(from), same(to)
+    );
+    verify(calendar.get("default"), never()).createEvent(any(), any(), any());
+  }
+
+  @Test(expected = CalendarWriteException.class)
+  public void createEvent_calendarThrowsException() throws CalendarWriteException, IOException {
+    //given
+    final String summary = "<summary>";
+    final DateTime from = DateTime.now();
+    final DateTime to = from.plusHours(1);
+
+    Map<String, CalendarCLIAdapter> calendar = new HashMap<>();
+    calendar.put("default", mock(CalendarCLIAdapter.class));
+
+    CalendarConfiguration.NAME_OF_DEFAULT_CALENDAR = "default";
+    doReturn(calendar).when(toTest).getCalendars();
+    doThrow(new IOException()).when(calendar.get("default")).createEvent(any(), any(), any());
+
+    //when
+    toTest.createEvent(null, summary, from, to);
   }
 }

@@ -1,5 +1,7 @@
 package de.rainu.alexa.cloud.speechlet;
 
+import static de.rainu.alexa.cloud.speechlet.CalendarSpeechlet.DIALOG_TYPE_NEW_EVENT;
+import static de.rainu.alexa.cloud.speechlet.CalendarSpeechlet.KEY_DIALOG_TYPE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -23,21 +25,27 @@ import com.amazon.speech.speechlet.Application;
 import com.amazon.speech.speechlet.IntentRequest;
 import com.amazon.speech.speechlet.Session;
 import com.amazon.speech.speechlet.SpeechletRequest;
+import com.amazon.speech.speechlet.SpeechletResponse;
 import com.amazon.speech.speechlet.User;
 import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rainu.alexa.cloud.calendar.exception.CalendarReadException;
+import de.rainu.alexa.cloud.calendar.exception.CalendarWriteException;
 import de.rainu.alexa.cloud.calendar.model.Event;
 import de.rainu.alexa.cloud.calendar.model.Moment;
 import de.rainu.alexa.cloud.calendar.service.CalendarService;
 import de.rainu.alexa.cloud.service.MessageService;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,11 +60,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = {
+    Sdk.DISABLE_REQUEST_SIGNATURE_CHECK_SYSTEM_PROPERTY + "=true"
+})
 public class CalendarSpeechletIT {
 
   @Autowired
@@ -70,7 +82,7 @@ public class CalendarSpeechletIT {
 
   ObjectMapper mapper;
 
-  public CalendarSpeechletIT(){
+  static {
     System.setProperty(Sdk.DISABLE_REQUEST_SIGNATURE_CHECK_SYSTEM_PROPERTY, "true");
   }
 
@@ -82,6 +94,7 @@ public class CalendarSpeechletIT {
 
     try{
       toTest.speechService = spy(toTest.speechService);
+      toTest.newEventDialogService = spy(toTest.newEventDialogService);
     }catch(MockitoException e){
       //don't spy a spy...
     }
@@ -346,6 +359,55 @@ public class CalendarSpeechletIT {
         ((PlainTextOutputSpeech)response.getResponse().getOutputSpeech()).getText());
   }
 
+  @Test
+  public void newEvent() throws CalendarWriteException {
+    //given
+    final PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+    speech.setText("<event-dialog>");
+    doReturn(SpeechletResponse.newTellResponse(speech)).when(toTest.newEventDialogService).handleDialogAction(any(), any());
+
+    //when
+    HttpEntity<String> request = buildRequest("NewEvent");
+
+    final SpeechletResponseEnvelope response = perform(request);
+
+    //then
+    assertTrue(response.getResponse().getOutputSpeech() instanceof PlainTextOutputSpeech);
+    assertEquals(
+        speech.getText(),
+        ((PlainTextOutputSpeech)response.getResponse().getOutputSpeech()).getText());
+  }
+
+  @Test
+  public void cancel_dialog() throws CalendarWriteException {
+    //given
+    //when
+    HttpEntity<String> request = buildRequestWithSession("AMAZON.CancelIntent",
+      new SimpleEntry<>(KEY_DIALOG_TYPE, DIALOG_TYPE_NEW_EVENT)
+    );
+
+    final SpeechletResponseEnvelope response = perform(request);
+
+    //then
+    assertEquals(
+        ((PlainTextOutputSpeech)toTest.speechService.speechCancelNewEvent(Locale.GERMANY)).getText(),
+        ((PlainTextOutputSpeech)response.getResponse().getOutputSpeech()).getText());
+  }
+
+  @Test
+  public void cancel_noDialog() throws CalendarWriteException {
+    //given
+    //when
+    HttpEntity<String> request = buildRequestWithSession("AMAZON.CancelIntent");
+
+    final SpeechletResponseEnvelope response = perform(request);
+
+    //then
+    assertEquals(
+        ((PlainTextOutputSpeech)toTest.speechService.speechGeneralConfirmation(Locale.GERMANY)).getText(),
+        ((PlainTextOutputSpeech)response.getResponse().getOutputSpeech()).getText());
+  }
+
   private SpeechletResponseEnvelope perform(HttpEntity<String> request){
     try {
       final ResponseEntity<String> response = rest.postForEntity(CalendarSpeechlet.ENDPOINT, request, String.class);
@@ -358,6 +420,14 @@ public class CalendarSpeechletIT {
   }
 
   private HttpEntity<String> buildRequest(String intentName, String...rawSlots) {
+    return buildRequest(intentName, new Entry[]{}, rawSlots);
+  }
+
+  private HttpEntity<String> buildRequestWithSession(String intentName, Entry<String, Object>...session) {
+    return buildRequest(intentName, session, new String[]{});
+  }
+
+  private HttpEntity<String> buildRequest(String intentName, Entry<String, Object>[] sAttributes, String[] rawSlots) {
     final HttpHeaders headers = new HttpHeaders();
     headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString());
 
@@ -365,6 +435,7 @@ public class CalendarSpeechletIT {
         .withUser(new User("<user-id>"))
         .withApplication(new Application("<application-id>"))
         .withSessionId("<session-id>")
+        .withAttributes(Stream.of(sAttributes).collect(Collectors.toMap(s -> s.getKey(), s -> s.getValue())))
         .withIsNew(true)
         .build();
 

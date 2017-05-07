@@ -7,6 +7,7 @@ import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFF
 import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFFIX_CALENDAR_NAME;
 import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFFIX_CALENDAR_URL;
 import static de.rainu.alexa.cloud.config.CalendarConfiguration.ENVIRONMENT_SUFFIX_TIMEZONE;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -50,6 +51,7 @@ public class CalendarConfigurationTest {
     toTest.buildCalendars();
 
     //then
+    assertEquals("calendar1", CalendarConfiguration.NAME_OF_DEFAULT_CALENDAR);
     verify(toTest, times(1)).buildBean(
         eq("calendar1"),
         eq("https://cloud.nextcloud.example/remote.php/dav"),
@@ -157,6 +159,7 @@ public class CalendarConfigurationTest {
     toTest.buildCalendars();
 
     //then
+    assertEquals("calendar1", CalendarConfiguration.NAME_OF_DEFAULT_CALENDAR);
     verify(toTest, times(1)).buildBean(
         eq("calendar1"),
         eq("https://cloud.nextcloud.example/remote.php/dav"),
