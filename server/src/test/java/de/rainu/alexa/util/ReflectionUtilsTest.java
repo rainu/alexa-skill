@@ -36,7 +36,7 @@ public class ReflectionUtilsTest {
     Method method = TestClass.class.getMethod("integer", Integer.class);
 
     //when
-    ReflectionUtils.call(method, toTest, 13L);
+    ReflectionUtils.call(method, toTest, new Argument(Long.class, 13L));
   }
 
   @Test
@@ -46,7 +46,7 @@ public class ReflectionUtilsTest {
     Method method = TestClass.class.getMethod("integer", Integer.class);
 
     //when
-    final Object result = ReflectionUtils.call(method, toTest, 13);
+    final Object result = ReflectionUtils.call(method, toTest, new Argument(Integer.class, 13));
 
     //then
     assertEquals("integer13", result);
@@ -59,7 +59,9 @@ public class ReflectionUtilsTest {
     Method method = TestClass.class.getMethod("integer", Integer.class);
 
     //when
-    final Object result = ReflectionUtils.call(method, toTest, 13, 14L);
+    final Object result = ReflectionUtils.call(method, toTest,
+        new Argument(Integer.class, 13),
+        new Argument(Long.class, 14L));
 
     //then
     assertEquals("integer13", result);
@@ -72,7 +74,9 @@ public class ReflectionUtilsTest {
     Method method = TestClass.class.getMethod("integer", Integer.class);
 
     //when
-    final Object result = ReflectionUtils.call(method, toTest, 13, 14);
+    final Object result = ReflectionUtils.call(method, toTest,
+        new Argument(Integer.class, 13),
+        new Argument(Integer.class, 14));
 
     //then
     assertEquals("integer13", result);
@@ -85,7 +89,9 @@ public class ReflectionUtilsTest {
     Method method = TestClass.class.getMethod("interfaceMethod", List.class);
 
     //when
-    final Object result = ReflectionUtils.call(method, toTest, 13, new ArrayList());
+    final Object result = ReflectionUtils.call(method, toTest,
+        new Argument(Integer.class, 13),
+        new Argument(ArrayList.class, new ArrayList()));
 
     //then
     assertEquals("interfaceArrayList", result);

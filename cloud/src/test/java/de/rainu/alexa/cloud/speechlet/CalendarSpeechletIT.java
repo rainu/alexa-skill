@@ -1,7 +1,7 @@
 package de.rainu.alexa.cloud.speechlet;
 
-import static de.rainu.alexa.cloud.speechlet.CalendarSpeechlet.DIALOG_TYPE_NEW_EVENT;
-import static de.rainu.alexa.cloud.speechlet.CalendarSpeechlet.KEY_DIALOG_TYPE;
+import static de.rainu.alexa.cloud.speechlet.BasicSpeechlet.DIALOG_TYPE_NEW_EVENT;
+import static de.rainu.alexa.cloud.speechlet.BasicSpeechlet.KEY_DIALOG_TYPE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -78,7 +78,13 @@ public class CalendarSpeechletIT {
   MessageService msg;
 
   @Autowired
-  CalendarSpeechlet toTest;
+  BasicSpeechlet toTestBasic;
+
+  @Autowired
+  NewEventSpeechlet toTestNewEvent;
+
+  @Autowired
+  QuerySpeechlet toTestQuery;
 
   ObjectMapper mapper;
 
@@ -90,11 +96,13 @@ public class CalendarSpeechletIT {
   public void setup(){
     mapper = (ObjectMapper) ReflectionTestUtils.getField(SpeechletRequestEnvelope.class, "OBJECT_MAPPER");
 
-    toTest.calendarService = mock(CalendarService.class);
+    toTestQuery.calendarService = mock(CalendarService.class);
 
     try{
-      toTest.speechService = spy(toTest.speechService);
-      toTest.newEventDialogService = spy(toTest.newEventDialogService);
+      toTestBasic.speechService = spy(toTestBasic.speechService);
+      toTestQuery.speechService = spy(toTestQuery.speechService);
+      toTestNewEvent.speechService = spy(toTestNewEvent.speechService);
+      toTestNewEvent.newEventDialogService = spy(toTestNewEvent.newEventDialogService);
     }catch(MockitoException e){
       //don't spy a spy...
     }
@@ -123,8 +131,8 @@ public class CalendarSpeechletIT {
     speech.setText("<event-listing>");
     List<Event> events = new ArrayList<>();
 
-    doReturn(events).when(toTest.calendarService).getNextEvents();
-    doReturn(speech).when(toTest.speechService).readEvents(any(), anyList());
+    doReturn(events).when(toTestQuery.calendarService).getNextEvents();
+    doReturn(speech).when(toTestQuery.speechService).readEvents(any(), anyList());
 
     HttpEntity<String> request = buildRequest("NextEvents");
 
@@ -132,7 +140,7 @@ public class CalendarSpeechletIT {
     final SpeechletResponseEnvelope response = perform(request);
 
     //then
-    verify(toTest.calendarService, times(1)).getNextEvents();
+    verify(toTestQuery.calendarService, times(1)).getNextEvents();
     assertNull(response.getResponse().getCard());
     assertTrue(response.getResponse().getOutputSpeech() instanceof PlainTextOutputSpeech);
     assertEquals(
@@ -143,7 +151,7 @@ public class CalendarSpeechletIT {
   @Test
   public void nextEvents_readError() throws CalendarReadException {
     //given
-    doThrow(new CalendarReadException("error")).when(toTest.calendarService).getNextEvents();
+    doThrow(new CalendarReadException("error")).when(toTestQuery.calendarService).getNextEvents();
 
     HttpEntity<String> request = buildRequest("NextEvents");
 
@@ -165,8 +173,8 @@ public class CalendarSpeechletIT {
     speech.setText("<event-listing>");
     List<Event> events = new ArrayList<>();
 
-    doReturn(events).when(toTest.calendarService).getEvents(any(), any());
-    doReturn(speech).when(toTest.speechService).readEvents(any(), anyString(), anyList());
+    doReturn(events).when(toTestQuery.calendarService).getEvents(any(), any());
+    doReturn(speech).when(toTestQuery.speechService).readEvents(any(), anyString(), anyList());
 
     //use cases
     testUseCase("diesen", "montag", Moment.MONDAY, speech);
@@ -195,7 +203,7 @@ public class CalendarSpeechletIT {
     final SpeechletResponseEnvelope response = perform(request);
 
     //then
-    verify(toTest.speechService, times(1)).readEvents(
+    verify(toTestQuery.speechService, times(1)).readEvents(
         eq(Locale.GERMANY), eq(expectedMoment.getName(Locale.GERMANY)), anyList());
 
     assertNull(response.getResponse().getCard());
@@ -233,8 +241,8 @@ public class CalendarSpeechletIT {
     speech.setText("<event-listing>");
     List<Event> events = new ArrayList<>();
 
-    doReturn(events).when(toTest.calendarService).getEvents(any(), any());
-    doReturn(speech).when(toTest.speechService).readEvents(any(), anyString(), anyList());
+    doReturn(events).when(toTestQuery.calendarService).getEvents(any(), any());
+    doReturn(speech).when(toTestQuery.speechService).readEvents(any(), anyString(), anyList());
 
     //when
     HttpEntity<String> request = buildRequest("EventQuery",
@@ -257,8 +265,8 @@ public class CalendarSpeechletIT {
     speech.setText("<event-listing>");
     List<Event> events = new ArrayList<>();
 
-    doReturn(events).when(toTest.calendarService).getEvents(any(), any());
-    doReturn(speech).when(toTest.speechService).readEvents(any(), anyString(), anyList());
+    doReturn(events).when(toTestQuery.calendarService).getEvents(any(), any());
+    doReturn(speech).when(toTestQuery.speechService).readEvents(any(), anyString(), anyList());
 
     //use cases
     testUseCase("heute", Moment.TODAY, speech);
@@ -273,7 +281,7 @@ public class CalendarSpeechletIT {
     final SpeechletResponseEnvelope response = perform(request);
 
     //then
-    verify(toTest.speechService, times(1)).readEvents(
+    verify(toTestQuery.speechService, times(1)).readEvents(
         eq(Locale.GERMANY), eq(expectedMoment.getName(Locale.GERMANY)), anyList());
 
     assertNull(response.getResponse().getCard());
@@ -290,8 +298,8 @@ public class CalendarSpeechletIT {
     speech.setText("<event-listing>");
     List<Event> events = new ArrayList<>();
 
-    doReturn(events).when(toTest.calendarService).getEvents(any(), any());
-    doReturn(speech).when(toTest.speechService).readEvents(any(), anyString(), anyList());
+    doReturn(events).when(toTestQuery.calendarService).getEvents(any(), any());
+    doReturn(speech).when(toTestQuery.speechService).readEvents(any(), anyString(), anyList());
 
     //when
     HttpEntity<String> request = buildRequest("EventQueryNear",
@@ -314,8 +322,8 @@ public class CalendarSpeechletIT {
     speech.setText("<event-listing>");
     List<Event> events = new ArrayList<>();
 
-    doReturn(events).when(toTest.calendarService).getEvents(any(), any());
-    doReturn(speech).when(toTest.speechService).readEvents(any(), anyString(), anyList());
+    doReturn(events).when(toTestQuery.calendarService).getEvents(any(), any());
+    doReturn(speech).when(toTestQuery.speechService).readEvents(any(), anyString(), anyList());
 
     //when
     HttpEntity<String> request = buildRequest("EventQueryThisWeek");
@@ -323,7 +331,7 @@ public class CalendarSpeechletIT {
     final SpeechletResponseEnvelope response = perform(request);
 
     //then
-    verify(toTest.speechService, times(1)).readEvents(
+    verify(toTestQuery.speechService, times(1)).readEvents(
         eq(Locale.GERMANY), eq(Moment.THIS_WEEK.getName(Locale.GERMANY)), anyList());
 
     assertNull(response.getResponse().getCard());
@@ -340,8 +348,8 @@ public class CalendarSpeechletIT {
     speech.setText("<event-listing>");
     List<Event> events = new ArrayList<>();
 
-    doReturn(events).when(toTest.calendarService).getEvents(any(), any());
-    doReturn(speech).when(toTest.speechService).readEvents(any(), anyString(), anyList());
+    doReturn(events).when(toTestQuery.calendarService).getEvents(any(), any());
+    doReturn(speech).when(toTestQuery.speechService).readEvents(any(), anyString(), anyList());
 
     //when
     HttpEntity<String> request = buildRequest("EventQueryNextWeek");
@@ -349,7 +357,7 @@ public class CalendarSpeechletIT {
     final SpeechletResponseEnvelope response = perform(request);
 
     //then
-    verify(toTest.speechService, times(1)).readEvents(
+    verify(toTestQuery.speechService, times(1)).readEvents(
         eq(Locale.GERMANY), eq(Moment.NEXT_WEEK.getName(Locale.GERMANY)), anyList());
 
     assertNull(response.getResponse().getCard());
@@ -364,7 +372,7 @@ public class CalendarSpeechletIT {
     //given
     final PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
     speech.setText("<event-dialog>");
-    doReturn(SpeechletResponse.newTellResponse(speech)).when(toTest.newEventDialogService).handleDialogAction(any(), any());
+    doReturn(SpeechletResponse.newTellResponse(speech)).when(toTestNewEvent.newEventDialogService).handleDialogAction(any(), any());
 
     //when
     HttpEntity<String> request = buildRequest("NewEvent");
@@ -390,7 +398,7 @@ public class CalendarSpeechletIT {
 
     //then
     assertEquals(
-        ((PlainTextOutputSpeech)toTest.speechService.speechCancelNewEvent(Locale.GERMANY)).getText(),
+        ((PlainTextOutputSpeech)toTestBasic.speechService.speechCancelNewEvent(Locale.GERMANY)).getText(),
         ((PlainTextOutputSpeech)response.getResponse().getOutputSpeech()).getText());
   }
 
@@ -404,13 +412,13 @@ public class CalendarSpeechletIT {
 
     //then
     assertEquals(
-        ((PlainTextOutputSpeech)toTest.speechService.speechGeneralConfirmation(Locale.GERMANY)).getText(),
+        ((PlainTextOutputSpeech)toTestBasic.speechService.speechGeneralConfirmation(Locale.GERMANY)).getText(),
         ((PlainTextOutputSpeech)response.getResponse().getOutputSpeech()).getText());
   }
 
   private SpeechletResponseEnvelope perform(HttpEntity<String> request){
     try {
-      final ResponseEntity<String> response = rest.postForEntity(CalendarSpeechlet.ENDPOINT, request, String.class);
+      final ResponseEntity<String> response = rest.postForEntity(BasicSpeechlet.ENDPOINT, request, String.class);
       assertEquals(HttpStatus.OK, response.getStatusCode());
 
       return mapper.readValue(response.getBody(), SpeechletResponseEnvelope.class);

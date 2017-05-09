@@ -5,18 +5,20 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.springframework.stereotype.Controller;
 
 /**
- * If an {@link com.amazon.speech.slu.Intent} is incoming this method will be invoked if the
- * name of the intent is equals like the value of this annotation.
+ * A class with this annotation will scanned for methods annotated by
+ * {@link OnIntent}, {@link OnLaunch}, {@link OnSessionStarted}, {@link OnSessionEnded}
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface OnIntent {
+@Target({ElementType.TYPE})
+@Controller
+public @interface SpeechletController {
 
   /**
-   * The intent name(s)
+   * The endpoint(s) of the skill.
    */
   String[] value();
 }

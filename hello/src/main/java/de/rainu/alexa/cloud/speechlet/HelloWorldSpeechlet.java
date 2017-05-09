@@ -6,13 +6,10 @@ import com.amazon.speech.ui.Reprompt;
 import com.amazon.speech.ui.SimpleCard;
 import de.rainu.alexa.annotation.OnIntent;
 import de.rainu.alexa.annotation.OnLaunch;
-import de.rainu.alexa.speechlet.AbstractSpeechletDispatcher;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import de.rainu.alexa.annotation.SpeechletController;
 
-@RestController
-@RequestMapping("/hello")
-public class HelloWorldSpeechlet extends AbstractSpeechletDispatcher {
+@SpeechletController("/hello")
+public class HelloWorldSpeechlet {
   /**
    * Creates and returns a {@code SpeechletResponse} with a welcome message.
    *
@@ -64,7 +61,7 @@ public class HelloWorldSpeechlet extends AbstractSpeechletDispatcher {
    *
    * @return SpeechletResponse spoken and visual response for the given intent
    */
-  @OnIntent("AMAZON.HelpIntent")
+  @OnIntent({ "AMAZON.HelpIntent", "AMAZON.StopIntent", "AMAZON.CancelIntent" })
   public SpeechletResponse getHelpResponse() {
     String speechText = "You can say hello to me!";
 

@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
  */
 public abstract class ReflectionUtils {
 
-  public static Object call(Method method, Object target, Object...arguments) {
+  public static Object call(Method method, Object target, Argument...arguments) {
     checkArguments(method, arguments);
 
     Object[] methodArguments = collectArguments(method, arguments);
@@ -17,15 +17,15 @@ public abstract class ReflectionUtils {
   /**
    * Checks if the required arguments are available.
    */
-  private static void checkArguments(Method method, Object[] arguments) {
+  private static void checkArguments(Method method, Argument[] arguments) {
     if(method.getParameterTypes().length > arguments.length){
       throw new IllegalArgumentException("Not enough arguments available for calling " + method.getName());
     }
 
     for(Class<?> requiredParamType : method.getParameterTypes()){
       boolean found = false;
-      for(Object arg : arguments){
-        if(requiredParamType.isAssignableFrom(arg.getClass())) {
+      for(Argument arg : arguments){
+        if(requiredParamType.isAssignableFrom(arg.getArgClass())) {
           found = true;
         }
       }
@@ -39,7 +39,7 @@ public abstract class ReflectionUtils {
   /**
    * Collect a object array for the given method by the given arguments.
    */
-  private static Object[] collectArguments(Method method, Object[] arguments) {
+  private static Object[] collectArguments(Method method, Argument[] arguments) {
     //at this point all arguments are available
     //no we have to order the arguments
 
@@ -47,9 +47,9 @@ public abstract class ReflectionUtils {
     outerLoop: for(int i=0; i < method.getParameterTypes().length; i++){
       Class<?> requiredParamType = method.getParameterTypes()[i];
 
-      for(Object arg : arguments){
-        if(requiredParamType.isAssignableFrom(arg.getClass())) {
-          targetArgs[i] = arg;
+      for(Argument arg : arguments){
+        if(requiredParamType.isAssignableFrom(arg.getArgClass())) {
+          targetArgs[i] = arg.getArgValue();
           continue outerLoop;
         }
       }
