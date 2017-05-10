@@ -185,14 +185,15 @@ public class SpeechService {
     }
   }
 
-  public OutputSpeech confirmNewEvent(DateTime from, DateTime to, Locale locale) {
+  public OutputSpeech confirmNewEvent(String title, DateTime from, DateTime to, Locale locale) {
     final String speechText;
     if(from.getYear() == to.getYear() && from.getDayOfYear() == to.getDayOfYear()) {
       speechText = messageService.de("event.new.confirm.sameday",
           from.toString(DAY_FORMAT, locale),
           from.toString(DATE_YEAR_FORMAT),
           from.toString(TIME_FORMAT),
-          to.toString(TIME_FORMAT));
+          to.toString(TIME_FORMAT),
+          title);
     } else {
       speechText = messageService.de("event.new.confirm",
           from.toString(DAY_FORMAT, locale),
@@ -200,7 +201,8 @@ public class SpeechService {
           from.toString(TIME_FORMAT),
           to.toString(DAY_FORMAT, locale),
           to.toString(DATE_YEAR_FORMAT),
-          to.toString(TIME_FORMAT));
+          to.toString(TIME_FORMAT),
+          title);
     }
 
     return speechMessage(speechText);

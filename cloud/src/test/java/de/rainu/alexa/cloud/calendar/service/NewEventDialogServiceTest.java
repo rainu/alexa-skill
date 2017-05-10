@@ -5,7 +5,7 @@ import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SESSIO
 import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SESSION_TO;
 import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SLOT_DATE;
 import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SLOT_DURATION;
-import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SLOT_SUMMARY;
+import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SLOT_PREFIX_SUMMARY;
 import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SLOT_TIME;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -110,7 +110,7 @@ public class NewEventDialogServiceTest {
             slot(SLOT_DATE, "2010-08-13"),
             slot(SLOT_TIME, "20:15"),
             slot(SLOT_DURATION, "PT2H"),
-            slot(SLOT_SUMMARY, "Title")
+            slot(SLOT_PREFIX_SUMMARY, "Title")
         ))
         .build();
     final IntentRequest request = IntentRequest.builder()
@@ -124,7 +124,7 @@ public class NewEventDialogServiceTest {
         .build();
     final PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
     speech.setText("<confirm>");
-    doReturn(speech).when(speechService).confirmNewEvent(any(), any(), any());
+    doReturn(speech).when(speechService).confirmNewEvent(any(), any(), any(), any());
 
     //when
     final SpeechletResponse response = toTest.handleDialogAction(request, session);
@@ -136,7 +136,7 @@ public class NewEventDialogServiceTest {
         json(SpeechletResponse.newDialogConfirmIntentResponse(speech)),
         json(response));
     verify(speechService, times(1)).confirmNewEvent(
-        dateCap.capture(), dateCap.capture(), same(request.getLocale()));
+        eq("Title"), dateCap.capture(), dateCap.capture(), same(request.getLocale()));
     assertEquals("dd.MM.yyyy HH:mm", session.getAttribute(SESSION_DATE_FORMAT));
     assertEquals("13.08.2010 20:15", session.getAttribute(SESSION_FROM));
     assertEquals("13.08.2010 22:15", session.getAttribute(SESSION_TO));
@@ -180,7 +180,7 @@ public class NewEventDialogServiceTest {
             slot(SLOT_DATE, "2010-08-13"),
             slot(SLOT_TIME, "20:15"),
             slot(SLOT_DURATION, "PT2H"),
-            slot(SLOT_SUMMARY, "Title")
+            slot(SLOT_PREFIX_SUMMARY, "Title")
         ))
         .withConfirmationStatus(ConfirmationStatus.CONFIRMED)
         .build();

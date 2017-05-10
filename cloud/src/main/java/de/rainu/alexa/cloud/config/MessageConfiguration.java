@@ -46,8 +46,8 @@ public class MessageConfiguration {
 
     m.put("event.new.cancel", "OK. Ich habe den Termin verworfen.");
     m.put("event.new.saved", "OK. Ich habe den Termin gespeichert.");
-    m.put("event.new.confirm", "Kann ich den Termin von %s, den <say-as interpret-as=\"date\" format=\"dmy\">%s</say-as> um %s Uhr bis %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> um %s Uhr speichern?");
-    m.put("event.new.confirm.sameday", "Kann ich den Termin am %s, den <say-as interpret-as=\"date\" format=\"dmy\">%s</say-as> von %s Uhr bis %s Uhr speichern?");
+    m.put("event.new.confirm", "Kann ich den Termin von %s, den <say-as interpret-as=\"date\" format=\"dmy\">%s</say-as> um %s Uhr bis %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> um %s Uhr mit dem Titel \"%s\" speichern?");
+    m.put("event.new.confirm.sameday", "Kann ich den Termin am %s, den <say-as interpret-as=\"date\" format=\"dmy\">%s</say-as> von %s Uhr bis %s Uhr mit dem Titel \"%s\" speichern?");
     m.put("event.new.card.title", "Neuer Termin erstellt");
     m.put("event.new.card.content", "Titel: %s\nBeginn: %s\nEnde:%s");
     m.put("event.new.card.content.time.format", "dd.MM.yyyy HH:mm");

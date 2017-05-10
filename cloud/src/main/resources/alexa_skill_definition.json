@@ -121,15 +121,56 @@
           ]
         },
         {
-          "name": "summary",
+          "name": "summary_a",
           "type": "TerminTitel",
           "samples": [
-            "{summary}",
-            "Der Termin soll {summary} heißen.",
-            "Er soll {summary} heißen.",
-            "Der Termin soll {summary} lauten.",
-            "Er soll {summary} lauten."
+            "{summary_a} {summary_b} {summary_c} {summary_d} {summary_e} {summary_f} {summary_g} {summary_h} {summary_i} {summary_j}"
           ]
+        },
+        {
+          "name": "summary_b",
+          "type": "TerminTitel",
+          "samples": []
+        },
+        {
+          "name": "summary_c",
+          "type": "TerminTitel",
+          "samples": []
+        },
+        {
+          "name": "summary_d",
+          "type": "TerminTitel",
+          "samples": []
+        },
+        {
+          "name": "summary_e",
+          "type": "TerminTitel",
+          "samples": []
+        },
+        {
+          "name": "summary_f",
+          "type": "TerminTitel",
+          "samples": []
+        },
+        {
+          "name": "summary_g",
+          "type": "TerminTitel",
+          "samples": []
+        },
+        {
+          "name": "summary_h",
+          "type": "TerminTitel",
+          "samples": []
+        },
+        {
+          "name": "summary_i",
+          "type": "TerminTitel",
+          "samples": []
+        },
+        {
+          "name": "summary_j",
+          "type": "TerminTitel",
+          "samples": []
         }
       ]
     },
@@ -242,22 +283,7 @@
       "values": [
         {
           "name": {
-            "value": "Termin"
-          }
-        },
-        {
-          "name": {
-            "value": "Titel"
-          }
-        },
-        {
-          "name": {
-            "value": "Todo"
-          }
-        },
-        {
-          "name": {
-            "value": "Geburtstag"
+            "value": "GibtEsNichtPlatzhalter"
           }
         }
       ]
@@ -351,7 +377,7 @@
       ]
     },
     {
-      "id": "Elicit.Intent-NewEvent.IntentSlot-summary",
+      "id": "Elicit.Intent-NewEvent.IntentSlot-summary_a",
       "promptVersion": "1.0",
       "definitionVersion": "1.0",
       "variations": [
@@ -451,13 +477,76 @@
             }
           },
           {
-            "name": "summary",
+            "name": "summary_a",
             "type": "TerminTitel",
             "elicitationRequired": true,
             "confirmationRequired": false,
             "prompts": {
-              "elicit": "Elicit.Intent-NewEvent.IntentSlot-summary"
+              "elicit": "Elicit.Intent-NewEvent.IntentSlot-summary_a"
             }
+          },
+          {
+            "name": "summary_b",
+            "type": "TerminTitel",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "summary_c",
+            "type": "TerminTitel",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "summary_d",
+            "type": "TerminTitel",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "summary_e",
+            "type": "TerminTitel",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "summary_f",
+            "type": "TerminTitel",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "summary_g",
+            "type": "TerminTitel",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "summary_h",
+            "type": "TerminTitel",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "summary_i",
+            "type": "TerminTitel",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "summary_j",
+            "type": "TerminTitel",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
           }
         ]
       },

@@ -10,6 +10,7 @@ import de.rainu.alexa.cloud.calendar.exception.CalendarWriteException;
 import de.rainu.alexa.cloud.service.MessageService;
 import de.rainu.alexa.cloud.service.SpeechService;
 import java.time.Duration;
+import java.util.stream.Collectors;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class NewEventDialogService {
 
-  public static final String SLOT_SUMMARY = "summary";
+  public static final String SLOT_PREFIX_SUMMARY = "summary_";
   public static final String SLOT_DATE = "date";
   public static final String SLOT_TIME = "time";
   public static final String SLOT_DURATION = "duration";
@@ -49,6 +50,7 @@ public class NewEventDialogService {
 
   private SpeechletResponse handleProgress(IntentRequest request, Session session) {
     if(allSlotsFilled(request)) {
+      final String title = collectSummary(request);
       final Duration duration = Duration.parse(request.getIntent().getSlot(SLOT_DURATION).getValue());
       final DateTime from = DateTime.parse(request.getIntent().getSlot(SLOT_DATE).getValue() + "T" + request.getIntent().getSlot(SLOT_TIME).getValue());
       final DateTime to = from.plus(duration.toMillis());
@@ -58,7 +60,7 @@ public class NewEventDialogService {
       session.setAttribute(SESSION_FROM, from.toString(dateFormat));
       session.setAttribute(SESSION_TO, to.toString(dateFormat));
 
-      final OutputSpeech speech = speechService.confirmNewEvent(from, to, request.getLocale());
+      final OutputSpeech speech = speechService.confirmNewEvent(title, from, to, request.getLocale());
       return SpeechletResponse.newDialogConfirmIntentResponse(speech);
     }
 
@@ -78,7 +80,7 @@ public class NewEventDialogService {
       throws CalendarWriteException {
     final String dateFormat = session.getAttribute(SESSION_DATE_FORMAT).toString();
     final DateTimeFormatter parser = DateTimeFormat.forPattern(dateFormat);
-    final String title = request.getIntent().getSlot(SLOT_SUMMARY).getValue();
+    final String title = collectSummary(request);
     final String from = session.getAttribute(SESSION_FROM).toString();
     final String to = session.getAttribute(SESSION_TO).toString();
 
@@ -95,9 +97,26 @@ public class NewEventDialogService {
         card);
   }
 
-  private boolean allSlotsFilled(IntentRequest request) {
+  private String collectSummary(IntentRequest request) {
     return request.getIntent().getSlots().values().stream()
+        .filter(s -> s.getName().startsWith(SLOT_PREFIX_SUMMARY))
+        .filter(s -> s.getValue() != null)
+        .sorted((s1, s2) -> s1.getName().compareTo(s2.getName()))
+        .map(s -> s.getValue())
+        .collect(Collectors.joining(" "));
+  }
+
+  private boolean allSlotsFilled(IntentRequest request) {
+     long withoutSummary = request.getIntent().getSlots().values().stream()
         .filter(s -> s.getValue() == null)
-        .count() == 0;
+        .filter(s -> !s.getName().startsWith(SLOT_PREFIX_SUMMARY))
+        .count();
+
+    long summary = request.getIntent().getSlots().values().stream()
+        .filter(s -> s.getValue() != null)
+        .filter(s -> s.getName().startsWith(SLOT_PREFIX_SUMMARY))
+        .count();
+
+    return withoutSummary == 0 && summary >= 1;
   }
 }
