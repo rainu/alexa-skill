@@ -1,7 +1,7 @@
 FROM openjdk:8-jre-alpine
 MAINTAINER rainu <rainu@raysha.de>
 
-# needed by coloud
+# needed by cloud
 RUN apk add --update git python2 python-dev py-pip build-base libxml2-dev libxslt-dev &&\
     git clone https://github.com/tobixen/calendar-cli.git &&\
     cd calendar-cli && chmod +x ./setup.py && ./setup.py install &&\
@@ -10,6 +10,7 @@ RUN apk add --update git python2 python-dev py-pip build-base libxml2-dev libxsl
     rm -rf /var/cache/apk/*
 
 COPY ./docker/start.sh /application/start.sh
+COPY ./docker/application.properties /application.properties
 
 #libs
 COPY ./server/target/lib/*.jar /application/lib/
