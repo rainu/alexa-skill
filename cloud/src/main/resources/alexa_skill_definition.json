@@ -87,7 +87,15 @@
         "Erstelle einen {calendar} Termin.",
         "Erstelle einen neuen {calendar} Termin.",
         "Lege einen {calendar} Termin an.",
-        "Lege einen neuen {calendar} Termin an."
+        "Lege einen neuen {calendar} Termin an.",
+        "und erstelle einen neuen {calendar} Eintrag.",
+        "und lege einen neuen {calendar} Eintrag an.",
+        "und erstelle einen {calendar} Eintrag.",
+        "und lege einen {calendar} Eintrag an.",
+        "Erstelle einen {calendar} Eintrag.",
+        "Erstelle einen neuen {calendar} Eintrag.",
+        "Lege einen {calendar} Eintrag an.",
+        "Lege einen neuen {calendar} Eintrag an."
       ],
       "slots": [
         {
@@ -190,6 +198,24 @@
         "Was geht ab."
       ],
       "slots": []
+    },
+    {
+      "name": "SetCalendarInSession",
+      "samples": [
+        "Öffne den {calendar} Kalender.",
+        "Starte den {calendar} Kalender.",
+        "und öffne den {calendar} Kalender.",
+        "und starte den {calendar} Kalender.",
+        "Verbinde dich mit dem {calendar} Kalender.",
+        "und verbinde dich mit dem {calendar} Kalender."
+      ],
+      "slots": [
+        {
+          "name": "calendar",
+          "type": "KalenderName",
+          "samples": []
+        }
+      ]
     }
   ],
   "types": [
@@ -577,6 +603,20 @@
         "confirmationRequired": false,
         "prompts": {},
         "slots": []
+      },
+      {
+        "name": "SetCalendarInSession",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "calendar",
+            "type": "KalenderName",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          }
+        ]
       }
     ]
   }

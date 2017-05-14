@@ -3,6 +3,7 @@ package de.rainu.alexa.cloud.speechlet;
 import static de.rainu.alexa.cloud.speechlet.BasicSpeechlet.DIALOG_TYPE_NEW_EVENT;
 import static de.rainu.alexa.cloud.speechlet.BasicSpeechlet.KEY_DIALOG_TYPE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -27,6 +28,7 @@ import com.amazon.speech.speechlet.Session;
 import com.amazon.speech.speechlet.SpeechletRequest;
 import com.amazon.speech.speechlet.SpeechletResponse;
 import com.amazon.speech.speechlet.User;
+import com.amazon.speech.speechlet.interfaces.dialog.directive.DelegateDirective;
 import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -102,7 +104,6 @@ public class CalendarSpeechletIT {
       toTestBasic.speechService = spy(toTestBasic.speechService);
       toTestQuery.speechService = spy(toTestQuery.speechService);
       toTestNewEvent.speechService = spy(toTestNewEvent.speechService);
-      toTestNewEvent.newEventDialogService = spy(toTestNewEvent.newEventDialogService);
     }catch(MockitoException e){
       //don't spy a spy...
     }
@@ -370,20 +371,14 @@ public class CalendarSpeechletIT {
   @Test
   public void newEvent() throws CalendarWriteException {
     //given
-    final PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
-    speech.setText("<event-dialog>");
-    doReturn(SpeechletResponse.newTellResponse(speech)).when(toTestNewEvent.newEventDialogService).handleDialogAction(any(), any());
-
     //when
     HttpEntity<String> request = buildRequest("NewEvent");
 
     final SpeechletResponseEnvelope response = perform(request);
 
     //then
-    assertTrue(response.getResponse().getOutputSpeech() instanceof PlainTextOutputSpeech);
-    assertEquals(
-        speech.getText(),
-        ((PlainTextOutputSpeech)response.getResponse().getOutputSpeech()).getText());
+    assertFalse(response.getResponse().getDirectives().isEmpty());
+    assertTrue(response.getResponse().getDirectives().get(0) instanceof DelegateDirective);
   }
 
   @Test

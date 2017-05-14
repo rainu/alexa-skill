@@ -1,13 +1,6 @@
-package de.rainu.alexa.cloud.calendar.service;
+package de.rainu.alexa.cloud.speechlet;
 
-import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SESSION_CALENDAR;
-import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SESSION_DATE_FORMAT;
-import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SESSION_FROM;
-import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SESSION_TO;
-import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SLOT_DATE;
-import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SLOT_DURATION;
-import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SLOT_PREFIX_SUMMARY;
-import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SLOT_TIME;
+import static de.rainu.alexa.cloud.speechlet.NewEventSpeechlet.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -30,6 +23,7 @@ import com.amazon.speech.ui.SimpleCard;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rainu.alexa.cloud.calendar.exception.CalendarWriteException;
+import de.rainu.alexa.cloud.calendar.service.CalendarService;
 import de.rainu.alexa.cloud.service.MessageService;
 import de.rainu.alexa.cloud.service.SpeechService;
 import java.util.AbstractMap.SimpleEntry;
@@ -52,7 +46,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class NewEventDialogServiceTest {
+public class NewEventSpeechletTest {
 
   SpeechService speechService;
 
@@ -62,7 +56,7 @@ public class NewEventDialogServiceTest {
   CalendarService calendarService;
 
   @Autowired
-  NewEventDialogService toTest;
+  NewEventSpeechlet toTest;
 
   ObjectMapper mapper;
 
@@ -83,6 +77,9 @@ public class NewEventDialogServiceTest {
   @Test
   public void inProgress_NotAllSlotsAreFilled() throws CalendarWriteException {
     //given
+    final Session session = Session.builder()
+        .withSessionId("<session-id>")
+        .build();
     final Intent intent = Intent.builder()
         .withName("<intent>")
         .withSlots(slots(
@@ -96,7 +93,7 @@ public class NewEventDialogServiceTest {
         .build();
 
     //when
-    final SpeechletResponse response = toTest.handleDialogAction(request, null);
+    final SpeechletResponse response = toTest.handleDialogAction(request, session);
 
     //then
     assertEquals(
@@ -150,6 +147,9 @@ public class NewEventDialogServiceTest {
   @Test
   public void denied() throws CalendarWriteException {
     //given
+    final Session session = Session.builder()
+        .withSessionId("<session-id>")
+        .build();
     final Intent intent = Intent.builder()
         .withName("<intent>")
         .withConfirmationStatus(ConfirmationStatus.DENIED)
@@ -165,7 +165,7 @@ public class NewEventDialogServiceTest {
     doReturn(speech).when(speechService).speechCancelNewEvent(any());
 
     //when
-    final SpeechletResponse response = toTest.handleDialogAction(request, null);
+    final SpeechletResponse response = toTest.handleDialogAction(request, session);
 
     //then
     verify(speechService, times(1)).speechCancelNewEvent(eq(request.getLocale()));
