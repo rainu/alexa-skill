@@ -19,14 +19,14 @@ table you can find the base environment variables you have to define.
 
 | Key  | Example value  |  Description  |
 |---|---|---|
-| CALDAV_NAME | parties  | A natural name/alias of this callendar. This is important because the user can ask for this name!  |
+| CALDAV_NAME | parties  | A natural name/alias of this calendar. This is important because the user can ask for this name!  |
 | CALDAV_URL  | https://cloud.nextcloud.example/remote.php/dav | The CalDav-URL of your calendar. In next/own-cloud instances it is normaly &lt;domain&gt;/remove.php/dav |
 | CALDAV_USER  | rainu | The user name for this calendar. |
 | CALDAV_PASSWORD  | secret | The users password. |
 | CALDAV_CALENDAR_URL  | calendars/rainu/1ca2131  | The specific calendar url. |
 | CALDAV_TIMEZONE | UTC | (optional) The default time zone for this calendar |
 
-You can configure multiple calendars. Just put a number (begining by zero) between **CALDAV_** and the **_suffix**. If you have multiple calendars the environment without numbers will be ignored! Lets say you will configure two calendars. Your environment have to look like this:
+You can configure multiple calendars. Just put a number (beginning by zero) between **CALDAV_** and the **_suffix**. If you have multiple calendars the environment without numbers will be ignored! Lets say you will configure two calendars. Your environment have to look like this:
 
 | Key  | value |
 |---|---|

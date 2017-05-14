@@ -1,5 +1,6 @@
 package de.rainu.alexa.cloud.calendar.service;
 
+import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SESSION_CALENDAR;
 import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SESSION_DATE_FORMAT;
 import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SESSION_FROM;
 import static de.rainu.alexa.cloud.calendar.service.NewEventDialogService.SESSION_TO;
@@ -32,6 +33,8 @@ import de.rainu.alexa.cloud.calendar.exception.CalendarWriteException;
 import de.rainu.alexa.cloud.service.MessageService;
 import de.rainu.alexa.cloud.service.SpeechService;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -216,6 +219,40 @@ public class NewEventDialogServiceTest {
     assertEquals(
         json(SpeechletResponse.newTellResponse(speechService.speechNewEventSaved(request.getLocale()), card)),
         json(response));
+  }
+
+  @Test
+  public void inProgress_CalendarName() throws CalendarWriteException {
+    checkCalendarName("geburtstag", "Geburtstage");
+    checkCalendarName("geburt", "Geburtstage");
+    checkCalendarName("termin", "Termine");
+    checkCalendarName("termine", "Termine");
+    checkCalendarName("haus", "Haushalt");
+    checkCalendarName("haushalt", "Haushalt");
+    checkCalendarName("Progammierung", null);
+  }
+
+  private void checkCalendarName(final String calendarSlot, final String expectedCalendar) throws CalendarWriteException {
+    final Intent intent = Intent.builder()
+        .withName("<intent>")
+        .withSlots(slots(
+            slot("calendar", calendarSlot)
+        ))
+        .build();
+    final IntentRequest request = IntentRequest.builder()
+        .withRequestId("<requestId>")
+        .withIntent(intent)
+        .withDialogState(DialogState.IN_PROGRESS)
+        .build();
+    final Session session = Session.builder()
+        .withSessionId("<sessionId>")
+        .build();
+    doReturn(new HashSet<>(Arrays.asList("Geburtstage", "Termine", "Haushalt"))).when(toTest).getCalendarNames();
+
+    toTest.handleDialogAction(request, session);
+
+    //then
+    assertEquals(expectedCalendar, session.getAttribute(SESSION_CALENDAR));
   }
 
   private Map<String, Object> attributes(Entry<String, Object> ... attributes) {

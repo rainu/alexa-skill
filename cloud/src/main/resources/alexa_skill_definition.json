@@ -80,16 +80,21 @@
     {
       "name": "NewEvent",
       "samples": [
-        "und erstelle einen neuen Termin.",
-        "und lege einen neuen Termin an.",
-        "und erstelle einen Termin.",
-        "und lege einen Termin an.",
-        "Erstelle einen Termin.",
-        "Erstelle einen neuen Termin.",
-        "Lege einen Termin an.",
-        "Lege einen neuen Termin an."
+        "und erstelle einen neuen {calendar} Termin.",
+        "und lege einen neuen {calendar} Termin an.",
+        "und erstelle einen {calendar} Termin.",
+        "und lege einen {calendar} Termin an.",
+        "Erstelle einen {calendar} Termin.",
+        "Erstelle einen neuen {calendar} Termin.",
+        "Lege einen {calendar} Termin an.",
+        "Lege einen neuen {calendar} Termin an."
       ],
       "slots": [
+        {
+          "name": "calendar",
+          "type": "KalenderName",
+          "samples": []
+        },
         {
           "name": "date",
           "type": "AMAZON.DATE",
@@ -188,6 +193,16 @@
     }
   ],
   "types": [
+    {
+      "name": "KalenderName",
+      "values": [
+        {
+          "name": {
+            "value": "GibtEsNichtPlatzhalter"
+          }
+        }
+      ]
+    },
     {
       "name": "NaherZeitpunkt",
       "values": [
@@ -449,6 +464,13 @@
           "confirm": "Confirm.Intent-NewEvent"
         },
         "slots": [
+          {
+            "name": "calendar",
+            "type": "KalenderName",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
           {
             "name": "date",
             "type": "AMAZON.DATE",

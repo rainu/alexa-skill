@@ -6,15 +6,23 @@ import com.amazon.speech.speechlet.Session;
 import com.amazon.speech.speechlet.SpeechletResponse;
 import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.SimpleCard;
+import de.rainu.alexa.cloud.calendar.CalendarCLIAdapter;
 import de.rainu.alexa.cloud.calendar.exception.CalendarWriteException;
 import de.rainu.alexa.cloud.service.MessageService;
 import de.rainu.alexa.cloud.service.SpeechService;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,10 +32,12 @@ public class NewEventDialogService {
   public static final String SLOT_DATE = "date";
   public static final String SLOT_TIME = "time";
   public static final String SLOT_DURATION = "duration";
+  public static final String SLOT_CALENDAR = "calendar";
 
   public static final String SESSION_FROM = "from";
   public static final String SESSION_TO = "to";
   public static final String SESSION_DATE_FORMAT = "date_format";
+  public static final String SESSION_CALENDAR = "calendar";
 
   @Autowired
   SpeechService speechService;
@@ -37,6 +47,15 @@ public class NewEventDialogService {
 
   @Autowired
   CalendarService calendarService;
+
+  @Autowired
+  private ApplicationContext context;
+
+  private Set<String> calendarNames;
+
+  Set<String> getCalendarNames(){
+    return context.getBeansOfType(CalendarCLIAdapter.class).keySet();
+  }
 
   public SpeechletResponse handleDialogAction(final IntentRequest request, final Session session)
       throws CalendarWriteException {
@@ -49,6 +68,8 @@ public class NewEventDialogService {
   }
 
   private SpeechletResponse handleProgress(IntentRequest request, Session session) {
+    checkCalendarName(request, session);
+
     if(allSlotsFilled(request)) {
       final String title = collectSummary(request);
       final Duration duration = Duration.parse(request.getIntent().getSlot(SLOT_DURATION).getValue());
@@ -81,10 +102,11 @@ public class NewEventDialogService {
     final String dateFormat = session.getAttribute(SESSION_DATE_FORMAT).toString();
     final DateTimeFormatter parser = DateTimeFormat.forPattern(dateFormat);
     final String title = collectSummary(request);
+    final String calendar = session.getAttribute(SESSION_CALENDAR) != null ? session.getAttribute(SESSION_CALENDAR).toString() : null;
     final String from = session.getAttribute(SESSION_FROM).toString();
     final String to = session.getAttribute(SESSION_TO).toString();
 
-    calendarService.createEvent(null, title,
+    calendarService.createEvent(calendar, title,
         parser.parseDateTime(from),
         parser.parseDateTime(to));
 
@@ -95,6 +117,40 @@ public class NewEventDialogService {
     return SpeechletResponse.newTellResponse(
         speechService.speechNewEventSaved(request.getLocale()),
         card);
+  }
+
+  private void checkCalendarName(IntentRequest request, Session session) {
+    if(request.getIntent().getSlot(SLOT_CALENDAR) == null) {
+      return;
+    }
+
+    final String givenName = request.getIntent().getSlot(SLOT_CALENDAR).getValue();
+    if(givenName == null) {
+      return;
+    }
+
+    final String foundName = findCalendarName(givenName);
+    session.setAttribute(SESSION_CALENDAR, foundName);
+  }
+
+  private String findCalendarName(final String calendarName) {
+    final String nCalendarName = calendarName.toLowerCase();
+    Map<String, Integer> distances = new HashMap<>();
+
+    for(String curCalendarName : getCalendarNames()) {
+      String nCurCalendarName = curCalendarName.toLowerCase();
+      int distance = StringUtils.getLevenshteinDistance(nCalendarName, nCurCalendarName);
+
+      if(distance <= 3 || nCurCalendarName.contains(nCalendarName)) {
+        distances.put(curCalendarName, distance);
+      }
+    }
+
+    if(distances.size() == 1) {
+      return distances.keySet().stream().findFirst().get();
+    }
+
+    return null;
   }
 
   private String collectSummary(IntentRequest request) {
@@ -110,11 +166,13 @@ public class NewEventDialogService {
      long withoutSummary = request.getIntent().getSlots().values().stream()
         .filter(s -> s.getValue() == null)
         .filter(s -> !s.getName().startsWith(SLOT_PREFIX_SUMMARY))
+        .filter(s -> !s.getName().equals(SLOT_CALENDAR))
         .count();
 
     long summary = request.getIntent().getSlots().values().stream()
         .filter(s -> s.getValue() != null)
         .filter(s -> s.getName().startsWith(SLOT_PREFIX_SUMMARY))
+        .filter(s -> !s.getName().equals(SLOT_CALENDAR))
         .count();
 
     return withoutSummary == 0 && summary >= 1;
