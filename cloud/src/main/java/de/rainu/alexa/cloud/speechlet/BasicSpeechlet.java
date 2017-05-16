@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * This class is responsible for handling incoming basic requests.
  */
-@SpeechletController(BasicSpeechlet.ENDPOINT)
+@SpeechletController(endpoint = BasicSpeechlet.ENDPOINT)
 public class BasicSpeechlet {
   public static final String ENDPOINT = "/cloud/calendar";
 

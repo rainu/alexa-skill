@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * This class is responsible for handling incoming event query requests.
  */
-@SpeechletController(BasicSpeechlet.ENDPOINT)
+@SpeechletController(endpoint = BasicSpeechlet.ENDPOINT)
 public class QuerySpeechlet {
   private static final Logger log = LoggerFactory.getLogger(QuerySpeechlet.class);
 

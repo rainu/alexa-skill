@@ -8,7 +8,7 @@ import de.rainu.alexa.annotation.OnIntent;
 import de.rainu.alexa.annotation.OnLaunch;
 import de.rainu.alexa.annotation.SpeechletController;
 
-@SpeechletController("/hello")
+@SpeechletController(endpoint = "/hello")
 public class HelloWorldSpeechlet {
   /**
    * Creates and returns a {@code SpeechletResponse} with a welcome message.

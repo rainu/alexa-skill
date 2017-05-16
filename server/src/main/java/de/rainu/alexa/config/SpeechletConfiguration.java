@@ -202,7 +202,7 @@ public class SpeechletConfiguration implements ServletContextInitializer {
       final Object speechlet = entry.getValue();
       final SpeechletController cfg = speechlet.getClass().getAnnotation(SpeechletController.class);
 
-      for(String endpoint : cfg.value()) {
+      for(String endpoint : cfg.endpoint()) {
         if (!endpointMapping.containsKey(endpoint)) {
           endpointMapping.put(endpoint, new ArrayList<>());
         }

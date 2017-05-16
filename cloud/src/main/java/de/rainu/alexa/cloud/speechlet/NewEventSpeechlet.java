@@ -31,7 +31,7 @@ import org.springframework.context.ApplicationContext;
 /**
  * This class is responsible for handling incoming event creation requests.
  */
-@SpeechletController(BasicSpeechlet.ENDPOINT)
+@SpeechletController(endpoint = BasicSpeechlet.ENDPOINT)
 public class NewEventSpeechlet {
 
   public static final String SLOT_PREFIX_SUMMARY = "summary_";
