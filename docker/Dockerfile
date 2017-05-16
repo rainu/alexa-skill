@@ -20,6 +20,7 @@ COPY ./cloud/target/lib/*.jar /application/lib/
 COPY ./server/target/*.jar /application/lib/server.jar
 COPY ./hello/target/*.jar /application/lib/hello.jar
 COPY ./cloud/target/*.jar /application/lib/coud.jar
+COPY ./bitcoin/target/*.jar /application/lib/bitcoin.jar
 
 
 EXPOSE 8080
