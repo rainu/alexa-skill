@@ -92,3 +92,12 @@ Where __query__ can be the following:
   * Lege einen neuen Termin an.
   
 Alexa will start a dialog with you where she ask you about event information.
+
+### set the target calendar
+
+With this intent you can set the target calendar in which are the new events will be saved.
+
+* Alexa, starte _skill_ und verbinde dich mit dem __calendar__ Kalender.
+
+* Alexa, starte _skill_.
+  * Verbinde dich mit dem __calendar__ Kalender.
