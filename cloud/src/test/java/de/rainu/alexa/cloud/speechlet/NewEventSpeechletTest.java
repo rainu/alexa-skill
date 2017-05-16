@@ -97,7 +97,7 @@ public class NewEventSpeechletTest {
 
     //then
     assertEquals(
-        json(SpeechletResponse.newDialogDelegateResponse()),
+        json(SpeechletResponse.newDialogDelegateResponse(intent)),
         json(response));
   }
 
@@ -107,8 +107,8 @@ public class NewEventSpeechletTest {
     final Intent intent = Intent.builder()
         .withName("<intent>")
         .withSlots(slots(
-            slot(SLOT_DATE, "2010-08-13"),
-            slot(SLOT_TIME, "20:15"),
+            slot(SLOT_DATE_FROM, "2010-08-13"),
+            slot(SLOT_TIME_FROM, "20:15"),
             slot(SLOT_DURATION, "PT2H"),
             slot(SLOT_PREFIX_SUMMARY, "Title")
         ))
@@ -169,9 +169,12 @@ public class NewEventSpeechletTest {
 
     //then
     verify(speechService, times(1)).speechCancelNewEvent(eq(request.getLocale()));
-    assertEquals(
-        json(SpeechletResponse.newTellResponse(speechService.speechCancelNewEvent(request.getLocale()))),
-        json(response));
+
+    final SpeechletResponse expected = SpeechletResponse
+        .newTellResponse(speechService.speechCancelNewEvent(request.getLocale()));
+    expected.setShouldEndSession(false);
+
+    assertEquals(json(expected), json(response));
   }
 
   @Test
@@ -180,8 +183,8 @@ public class NewEventSpeechletTest {
     final Intent intent = Intent.builder()
         .withName("<intent>")
         .withSlots(slots(
-            slot(SLOT_DATE, "2010-08-13"),
-            slot(SLOT_TIME, "20:15"),
+            slot(SLOT_DATE_FROM, "2010-08-13"),
+            slot(SLOT_TIME_FROM, "20:15"),
             slot(SLOT_DURATION, "PT2H"),
             slot(SLOT_PREFIX_SUMMARY, "Title")
         ))
@@ -216,9 +219,12 @@ public class NewEventSpeechletTest {
     verify(speechService, times(1)).speechNewEventSaved(eq(request.getLocale()));
     verify(calendarService, times(1)).createEvent(
         null, "Title", DateTime.parse("2010-08-13T20:15"), DateTime.parse("2010-08-13T22:15"));
-    assertEquals(
-        json(SpeechletResponse.newTellResponse(speechService.speechNewEventSaved(request.getLocale()), card)),
-        json(response));
+
+    final SpeechletResponse expected = SpeechletResponse
+        .newTellResponse(speechService.speechNewEventSaved(request.getLocale()), card);
+    expected.setShouldEndSession(false);
+
+    assertEquals(json(expected), json(response));
   }
 
   @Test

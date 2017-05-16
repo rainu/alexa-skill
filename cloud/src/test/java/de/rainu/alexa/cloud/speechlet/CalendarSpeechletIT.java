@@ -407,7 +407,7 @@ public class CalendarSpeechletIT {
 
     //then
     assertEquals(
-        ((PlainTextOutputSpeech)toTestBasic.speechService.speechGeneralConfirmation(Locale.GERMANY)).getText(),
+        ((PlainTextOutputSpeech)toTestBasic.speechService.speechBye(Locale.GERMANY)).getText(),
         ((PlainTextOutputSpeech)response.getResponse().getOutputSpeech()).getText());
   }
 

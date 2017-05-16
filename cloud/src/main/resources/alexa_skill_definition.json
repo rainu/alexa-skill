@@ -80,50 +80,81 @@
     {
       "name": "NewEvent",
       "samples": [
-        "und erstelle einen neuen {calendar} Termin.",
-        "und lege einen neuen {calendar} Termin an.",
-        "und erstelle einen {calendar} Termin.",
-        "und lege einen {calendar} Termin an.",
-        "Erstelle einen {calendar} Termin.",
-        "Erstelle einen neuen {calendar} Termin.",
-        "Lege einen {calendar} Termin an.",
-        "Lege einen neuen {calendar} Termin an.",
-        "und erstelle einen neuen {calendar} Eintrag.",
-        "und lege einen neuen {calendar} Eintrag an.",
-        "und erstelle einen {calendar} Eintrag.",
-        "und lege einen {calendar} Eintrag an.",
-        "Erstelle einen {calendar} Eintrag.",
-        "Erstelle einen neuen {calendar} Eintrag.",
-        "Lege einen {calendar} Eintrag an.",
-        "Lege einen neuen {calendar} Eintrag an."
+        "und erstelle einen neuen Termin.",
+        "und lege einen neuen Termin an.",
+        "und erstelle einen Termin.",
+        "und lege einen Termin an.",
+        "Erstelle einen Termin.",
+        "Erstelle einen neuen Termin.",
+        "Lege einen Termin an.",
+        "Lege einen neuen Termin an.",
+        "und erstelle einen neuen Eintrag.",
+        "und lege einen neuen Eintrag an.",
+        "und erstelle einen Eintrag.",
+        "und lege einen Eintrag an.",
+        "Erstelle einen Eintrag.",
+        "Erstelle einen neuen Eintrag.",
+        "Lege einen Eintrag an.",
+        "Lege einen neuen Eintrag an.",
+        "und erstelle noch einen neuen Termin.",
+        "und lege noch einen neuen Termin an.",
+        "und erstelle noch einen Termin.",
+        "und lege noch einen Termin an.",
+        "Erstelle noch einen Termin.",
+        "Erstelle noch einen neuen Termin.",
+        "Lege noch einen Termin an.",
+        "Lege noch einen neuen Termin an.",
+        "und erstelle noch einen neuen Eintrag.",
+        "und lege noch einen neuen Eintrag an.",
+        "und erstelle noch einen Eintrag.",
+        "und lege noch einen Eintrag an.",
+        "Erstelle noch einen Eintrag.",
+        "Erstelle noch einen neuen Eintrag.",
+        "Lege noch einen Eintrag an.",
+        "Lege noch einen neuen Eintrag an."
       ],
       "slots": [
         {
-          "name": "calendar",
-          "type": "KalenderName",
+          "name": "date_from",
+          "type": "AMAZON.DATE",
+          "samples": [
+            "Am {date_from}.",
+            "Für den {date_from}.",
+            "Für {date_from}.",
+            "Für {date_from} um {time_from}.",
+            "Für den {date_from} um {time_from}.",
+            "Am {date_from} um {time_from}.",
+            "Am {date_from} um {time_from} für {duration}.",
+            "Für den {date_from} um {time_from} für {duration}.",
+            "Von {date_from} um {time_from} bis {time_to}.",
+            "Von {date_from} bis {date_to}.",
+            "Von {date_from} um {time_from} bis {date_to} um {time_to}.",
+            "Von {date_from} bis zum {date_to}.",
+            "{date_from} bis {date_to}."
+          ]
+        },
+        {
+          "name": "time_from",
+          "type": "AMAZON.TIME",
+          "samples": [
+            "Um {time_from} Uhr.",
+            "Um {time_from}.",
+            "Um {time_from} für {duration}.",
+            "Um {time_from} Uhr für {duration}.",
+            "Um {time_from} bis {time_to}.",
+            "Von {time_from} bis {time_to}.",
+            "{time_from} bis {time_to}."
+          ]
+        },
+        {
+          "name": "date_to",
+          "type": "AMAZON.DATE",
           "samples": []
         },
         {
-          "name": "date",
-          "type": "AMAZON.DATE",
-          "samples": [
-            "Am {date}.",
-            "Für den {date}.",
-            "Für {date}.",
-            "Für {date} um {time}.",
-            "Für den {date} um {time}.",
-            "Am {date} um {time}."
-          ]
-        },
-        {
-          "name": "time",
+          "name": "time_to",
           "type": "AMAZON.TIME",
-          "samples": [
-            "Um {time} Uhr.",
-            "Um {time}.",
-            "Um {time} für {duration}.",
-            "Um {time} Uhr für {duration}."
-          ]
+          "samples": []
         },
         {
           "name": "duration",
@@ -207,13 +238,19 @@
         "und öffne den {calendar} Kalender.",
         "und starte den {calendar} Kalender.",
         "Verbinde dich mit dem {calendar} Kalender.",
-        "und verbinde dich mit dem {calendar} Kalender."
+        "und verbinde dich mit dem {calendar} Kalender.",
+        "Mach {calendar} auf.",
+        "und mache {calendar} auf.",
+        "Wähle {calendar} aus.",
+        "und wähle {calendar} aus."
       ],
       "slots": [
         {
           "name": "calendar",
           "type": "KalenderName",
-          "samples": []
+          "samples": [
+            "Mit {calendar}."
+          ]
         }
       ]
     }
@@ -225,6 +262,21 @@
         {
           "name": {
             "value": "GibtEsNichtPlatzhalter"
+          }
+        },
+        {
+          "name": {
+            "value": "Geburtstag"
+          }
+        },
+        {
+          "name": {
+            "value": "Termine"
+          }
+        },
+        {
+          "name": {
+            "value": "Haushalt"
           }
         }
       ]
@@ -360,35 +412,31 @@
       "variations": [
         {
           "type": "PlainText",
-          "value": "Soll ich diesen Termin von {date} bis {duration} so speichern?"
+          "value": "Soll ich diesen Termin von {date_from} bis {duration} so speichern?"
         },
         {
           "type": "PlainText",
-          "value": "Soll ich den Termin von {date} bis {duration} so erstellen?"
+          "value": "Soll ich den Termin von {date_from} bis {duration} so erstellen?"
         },
         {
           "type": "PlainText",
-          "value": "Kann ich den Termin von {date} bis {duration} speichern?"
+          "value": "Kann ich den Termin von {date_from} bis {duration} speichern?"
         },
         {
           "type": "PlainText",
-          "value": "Kann ich den Termin von {date} bis {duration} erstellen?"
+          "value": "Kann ich den Termin von {date_from} bis {duration} erstellen?"
         },
         {
           "type": "PlainText",
-          "value": "Kann ich den Termin von {date} bis {duration} anlegen?"
+          "value": "Kann ich den Termin von {date_from} bis {duration} anlegen?"
         }
       ]
     },
     {
-      "id": "Elicit.Intent-NewEvent.IntentSlot-date",
+      "id": "Elicit.Intent-NewEvent.IntentSlot-date_from",
       "promptVersion": "1.0",
       "definitionVersion": "1.0",
       "variations": [
-        {
-          "type": "PlainText",
-          "value": "Für welchen Tag soll ich den Termin eintragen?"
-        },
         {
           "type": "PlainText",
           "value": "Für wann soll ich den Termin eintragen?"
@@ -396,7 +444,7 @@
       ]
     },
     {
-      "id": "Elicit.Intent-NewEvent.IntentSlot-time",
+      "id": "Elicit.Intent-NewEvent.IntentSlot-time_from",
       "promptVersion": "1.0",
       "definitionVersion": "1.0",
       "variations": [
@@ -425,6 +473,17 @@
         {
           "type": "PlainText",
           "value": "Wie soll der Termin heißen?"
+        }
+      ]
+    },
+    {
+      "id": "Elicit.Intent-SetCalendarInSession.IntentSlot-calendar",
+      "promptVersion": "1.0",
+      "definitionVersion": "1.0",
+      "variations": [
+        {
+          "type": "PlainText",
+          "value": "Mit welchem Kalender soll ich mich verbinden?"
         }
       ]
     }
@@ -491,29 +550,36 @@
         },
         "slots": [
           {
-            "name": "calendar",
-            "type": "KalenderName",
+            "name": "date_from",
+            "type": "AMAZON.DATE",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-NewEvent.IntentSlot-date_from"
+            }
+          },
+          {
+            "name": "time_from",
+            "type": "AMAZON.TIME",
+            "elicitationRequired": true,
+            "confirmationRequired": false,
+            "prompts": {
+              "elicit": "Elicit.Intent-NewEvent.IntentSlot-time_from"
+            }
+          },
+          {
+            "name": "date_to",
+            "type": "AMAZON.DATE",
             "elicitationRequired": false,
             "confirmationRequired": false,
             "prompts": {}
           },
           {
-            "name": "date",
-            "type": "AMAZON.DATE",
-            "elicitationRequired": true,
-            "confirmationRequired": false,
-            "prompts": {
-              "elicit": "Elicit.Intent-NewEvent.IntentSlot-date"
-            }
-          },
-          {
-            "name": "time",
+            "name": "time_to",
             "type": "AMAZON.TIME",
-            "elicitationRequired": true,
+            "elicitationRequired": false,
             "confirmationRequired": false,
-            "prompts": {
-              "elicit": "Elicit.Intent-NewEvent.IntentSlot-time"
-            }
+            "prompts": {}
           },
           {
             "name": "duration",
@@ -612,9 +678,11 @@
           {
             "name": "calendar",
             "type": "KalenderName",
-            "elicitationRequired": false,
+            "elicitationRequired": true,
             "confirmationRequired": false,
-            "prompts": {}
+            "prompts": {
+              "elicit": "Elicit.Intent-SetCalendarInSession.IntentSlot-calendar"
+            }
           }
         ]
       }

@@ -1,9 +1,12 @@
 package de.rainu.alexa.cloud.speechlet;
 
+import com.amazon.speech.slu.Intent;
+import com.amazon.speech.slu.Slot;
 import com.amazon.speech.speechlet.DialogState;
 import com.amazon.speech.speechlet.IntentRequest;
 import com.amazon.speech.speechlet.Session;
 import com.amazon.speech.speechlet.SpeechletResponse;
+import com.amazon.speech.speechlet.interfaces.dialog.directive.ConfirmationStatus;
 import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.SimpleCard;
 import de.rainu.alexa.annotation.OnIntent;
@@ -32,8 +35,10 @@ import org.springframework.context.ApplicationContext;
 public class NewEventSpeechlet {
 
   public static final String SLOT_PREFIX_SUMMARY = "summary_";
-  public static final String SLOT_DATE = "date";
-  public static final String SLOT_TIME = "time";
+  public static final String SLOT_DATE_FROM = "date_from";
+  public static final String SLOT_TIME_FROM = "time_from";
+  public static final String SLOT_DATE_TO = "date_to";
+  public static final String SLOT_TIME_TO = "time_to";
   public static final String SLOT_DURATION = "duration";
   public static final String SLOT_CALENDAR = "calendar";
 
@@ -63,17 +68,34 @@ public class NewEventSpeechlet {
   @OnIntent("NewEvent")
   public SpeechletResponse handleDialogAction(final IntentRequest request, final Session session) throws CalendarWriteException {
     session.setAttribute(BasicSpeechlet.KEY_DIALOG_TYPE, BasicSpeechlet.DIALOG_TYPE_NEW_EVENT);
+    final SpeechletResponse response;
 
     try {
       switch (request.getIntent().getConfirmationStatus()) {
         default:
-        case NONE: return handleProgress(request, session);
-        case CONFIRMED: return handleConfirmed(request, session);
-        case DENIED: return handleDenied(request, session);
+        case NONE: response = handleProgress(request, session);
+          break;
+        case CONFIRMED: response = handleConfirmed(request, session);
+          break;
+        case DENIED: response = handleDenied(request, session);
+          break;
       }
     } catch (CalendarWriteException e) {
       return SpeechletResponse.newTellResponse(speechService.speechError(e));
     }
+
+    response.setShouldEndSession(false);
+    return response;
+  }
+
+  @OnIntent("SetCalendarInSession")
+  public SpeechletResponse handleSetCalendarInSession(IntentRequest request, Session session){
+    final String calendarName = checkCalendarName(request, session);
+    final OutputSpeech answer = speechService.speechConnectWithCalendar(calendarName, request.getLocale());
+    final SpeechletResponse response = SpeechletResponse.newTellResponse(answer);
+    response.setShouldEndSession(false);
+
+    return response;
   }
 
   private SpeechletResponse handleProgress(IntentRequest request, Session session) {
@@ -81,9 +103,9 @@ public class NewEventSpeechlet {
 
     if(allSlotsFilled(request)) {
       final String title = collectSummary(request);
-      final Duration duration = Duration.parse(request.getIntent().getSlot(SLOT_DURATION).getValue());
-      final DateTime from = DateTime.parse(request.getIntent().getSlot(SLOT_DATE).getValue() + "T" + request.getIntent().getSlot(SLOT_TIME).getValue());
-      final DateTime to = from.plus(duration.toMillis());
+      final DateTime from = DateTime.parse(
+          sv(request, SLOT_DATE_FROM) + "T" + sv(request, SLOT_TIME_FROM));
+      final DateTime to = getTimeTo(request, from);
 
       final String dateFormat = messageService.de("event.new.card.content.time.format");
       session.setAttribute(SESSION_DATE_FORMAT, dateFormat);
@@ -96,13 +118,57 @@ public class NewEventSpeechlet {
 
     //normally we want to delegate because we have defined the dialog into the model on alexa
     if( request.getDialogState() != DialogState.COMPLETED) {
-      return SpeechletResponse.newDialogDelegateResponse();
+      Intent updatedIntent = updateIntent(request.getIntent());
+      return SpeechletResponse.newDialogDelegateResponse(updatedIntent);
     }
 
     return SpeechletResponse.newTellResponse(speechService.speechCancelNewEvent(request.getLocale()));
   }
 
+  private Intent updateIntent(Intent intent) {
+    Map<String, Slot> slots = new HashMap<>(intent.getSlots());
+
+    if(sv(intent, SLOT_DATE_TO) != null || sv(intent, SLOT_TIME_TO) != null) {
+      if(sv(intent, SLOT_DURATION) == null) {
+        Slot updatedSlot = Slot.builder()
+            .withName(SLOT_DURATION)
+            .withConfirmationStatus(ConfirmationStatus.NONE)
+            .withValue("<placeholder>")
+            .build();
+        slots.put(SLOT_DURATION, updatedSlot);
+      }
+    }
+
+    return Intent.builder()
+        .withName(intent.getName())
+        .withConfirmationStatus(intent.getConfirmationStatus())
+        .withSlots(slots)
+        .build();
+  }
+
+  private DateTime getTimeTo(IntentRequest request, DateTime from) {
+    final String sDuration = sv(request, SLOT_DURATION);
+    final String sDateFrom = sv(request, SLOT_DATE_FROM);
+    final String sDateTo = sv(request, SLOT_DATE_TO);
+    final String sTimeTo = sv(request, SLOT_TIME_TO);
+
+    if(sTimeTo != null) {
+      if(sDateTo != null) {
+        return DateTime.parse(sDateTo + "T" + sTimeTo);
+      }
+
+      return DateTime.parse(sDateFrom + "T" + sTimeTo);
+    } else if(sDateTo != null) {
+      return DateTime.parse(sDateTo).withTimeAtStartOfDay();
+    }
+
+    final Duration duration = Duration.parse(sDuration);
+    return from.plus(duration.toMillis());
+  }
+
   private SpeechletResponse handleDenied(IntentRequest request, Session session) {
+    session.removeAttribute(BasicSpeechlet.KEY_DIALOG_TYPE);
+
     return SpeechletResponse.newTellResponse(speechService.speechCancelNewEvent(request.getLocale()));
   }
 
@@ -123,23 +189,27 @@ public class NewEventSpeechlet {
     card.setTitle(messageService.de("event.new.card.title"));
     card.setContent(messageService.de("event.new.card.content", title, from, to));
 
+    session.removeAttribute(BasicSpeechlet.KEY_DIALOG_TYPE);
+
     return SpeechletResponse.newTellResponse(
         speechService.speechNewEventSaved(request.getLocale()),
         card);
   }
 
-  private void checkCalendarName(IntentRequest request, Session session) {
-    if(request.getIntent().getSlot(SLOT_CALENDAR) == null) {
-      return;
+  private String checkCalendarName(IntentRequest request, Session session) {
+    if(sv(request, SLOT_CALENDAR) == null) {
+      return null;
     }
 
-    final String givenName = request.getIntent().getSlot(SLOT_CALENDAR).getValue();
+    final String givenName = sv(request, SLOT_CALENDAR);
     if(givenName == null) {
-      return;
+      return null;
     }
 
     final String foundName = findCalendarName(givenName);
     session.setAttribute(SESSION_CALENDAR, foundName);
+
+    return foundName;
   }
 
   private String findCalendarName(final String calendarName) {
@@ -172,18 +242,32 @@ public class NewEventSpeechlet {
   }
 
   private boolean allSlotsFilled(IntentRequest request) {
-    long withoutSummary = request.getIntent().getSlots().values().stream()
-        .filter(s -> s.getValue() == null)
-        .filter(s -> !s.getName().startsWith(SLOT_PREFIX_SUMMARY))
-        .filter(s -> !s.getName().equals(SLOT_CALENDAR))
-        .count();
-
     long summary = request.getIntent().getSlots().values().stream()
         .filter(s -> s.getValue() != null)
         .filter(s -> s.getName().startsWith(SLOT_PREFIX_SUMMARY))
-        .filter(s -> !s.getName().equals(SLOT_CALENDAR))
         .count();
 
-    return withoutSummary == 0 && summary >= 1;
+    Set<String> slots = request.getIntent().getSlots().values().stream()
+        .filter(s -> s.getValue() != null)
+        .map(s -> s.getName())
+        .collect(Collectors.toSet());
+
+    return
+        slots.contains(SLOT_DATE_FROM) &&
+        slots.contains(SLOT_TIME_FROM) &&
+        (slots.contains(SLOT_DURATION) || slots.contains(SLOT_DATE_TO) || slots.contains(SLOT_TIME_TO)) &&
+        summary > 0;
+  }
+
+  private String sv(final IntentRequest request, final String slot) {
+    return sv(request.getIntent(), slot);
+  }
+
+  private String sv(final Intent intent, final String slot) {
+    if(intent.getSlot(slot) == null) {
+      return null;
+    }
+
+    return intent.getSlot(slot).getValue();
   }
 }

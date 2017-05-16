@@ -30,6 +30,7 @@ public class MessageConfiguration {
 
     m.put("welcome", "Willkommen in deinem Kalender.");
     m.put("confirm", "OK.");
+    m.put("bye", "Bis zum nächsten mal.");
     m.put("help", "Frage mich: was ansteht, um die aktuellen Termine zu erfahren. Oder trage einen neuen Termin ein.");
 
     m.put("event.listing.start", "Folgende Termine stehen %s an:");
@@ -43,6 +44,8 @@ public class MessageConfiguration {
     m.put("event.item.date.time", "Am %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> um %s Uhr: %s");
     m.put("event.item.date.time.duration", "Am %s, den <say-as interpret-as=\"date\" format=\"dm\">%s</say-as> von %s Uhr bis %s Uhr: %s");
     m.put("event.nothing", "Es stehen %s keine Termine an.");
+
+    m.put("event.connect.calendar", "Ich habe mich mit dem Kalender \"%s\" verbunden.");
 
     m.put("event.new.cancel", "OK. Ich habe den Termin verworfen.");
     m.put("event.new.saved", "OK. Ich habe den Termin gespeichert.");

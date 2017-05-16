@@ -27,6 +27,11 @@ public class SpeechService {
     return speechMessage(speechText);
   }
 
+  public OutputSpeech speechBye(Locale locale) {
+    final String speechText = messageService.de("bye");
+    return speechMessage(speechText);
+  }
+
   public OutputSpeech speechHelpMessage(Locale locale) {
     final String speechText = messageService.de("help");
     return speechMessage(speechText);
@@ -210,6 +215,11 @@ public class SpeechService {
 
   public OutputSpeech speechNewEventSaved(Locale locale) {
     final String speechText = messageService.de("event.new.saved");
+    return speechMessage(speechText);
+  }
+
+  public OutputSpeech speechConnectWithCalendar(String calendarName, Locale locale) {
+    final String speechText = messageService.de("event.connect.calendar", calendarName);
     return speechMessage(speechText);
   }
 }

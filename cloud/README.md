@@ -11,6 +11,7 @@ This module contains features for (next/own)cloud. At the moment only the featur
   * _Language_: german
   * _Name_: any name
   * _Interaction Model_: paste the code from __resources/alexa_skill_definition.json__
+  * actually its a good idea to extend the slot type __KalenderName__ with your calDAV calendar names.
 
 # how to configure server
 

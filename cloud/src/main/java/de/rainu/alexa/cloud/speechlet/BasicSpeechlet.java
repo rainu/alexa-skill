@@ -55,10 +55,14 @@ public class BasicSpeechlet {
 
     if(DIALOG_TYPE_NEW_EVENT.equals(session.getAttribute(KEY_DIALOG_TYPE))){
       speech = speechService.speechCancelNewEvent(request.getLocale());
-    } else {
-      speech = speechService.speechGeneralConfirmation(request.getLocale());
+      final SpeechletResponse response = SpeechletResponse.newTellResponse(speech);
+      response.setShouldEndSession(false);
+
+      return response;
     }
 
-    return SpeechletResponse.newTellResponse(speech);
+    speech = speechService.speechBye(request.getLocale());
+    final SpeechletResponse response = SpeechletResponse.newTellResponse(speech);
+    return response;
   }
 }
