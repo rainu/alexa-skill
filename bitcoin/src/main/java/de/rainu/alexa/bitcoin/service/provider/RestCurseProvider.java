@@ -49,7 +49,7 @@ public class RestCurseProvider implements BitcoinCurseProvider {
   }
 
   private boolean ttlIsOver() {
-    return new Duration(DateTime.now(), lastCall).getStandardMinutes() >= 1;
+    return Math.abs(new Duration(DateTime.now(), lastCall).getStandardMinutes()) >= 1;
   }
 
   private BitcoinCurse requestBitcoinCurse() throws IOException {
