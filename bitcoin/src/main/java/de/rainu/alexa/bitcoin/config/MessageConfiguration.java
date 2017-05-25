@@ -33,7 +33,7 @@ public class MessageConfiguration {
     m.put("bye", "Bis zum nächsten mal.");
     m.put("help", "DU bist der Meister!");
 
-    m.put("bitcoin.curse.current", "Ein Bitcoin ist momentan %s Euro wert!");
+    m.put("bitcoin.curse.current", "Ein Bitcoin ist momentan <say-as interpret-as=\"unit\">%s€</say-as> wert!");
 
     return Collections.unmodifiableMap(m);
   }
